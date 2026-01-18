@@ -105,6 +105,11 @@
                 <label>Email (Dùng chung cho các lần gửi)</label>
                 <input type="email" class="input-field" id="userEmail" placeholder="Nhập email của bạn...">
             </div>
+
+            <div id="memory-stats">
+                <i class="fas fa-spinner fa-spin"></i> Đang kiểm tra kho lưu trữ...
+            </div>
+
             <div class="input-group">
                  <label>Lời nhắn gửi hoặc mô tả về những bức ảnh bạn đã tải lên</label>
                 <textarea class="confession-text" id="confessionText" placeholder="Kể về kỷ niệm này..."></textarea>
@@ -283,7 +288,7 @@
         btn.disabled = false;
         btn.innerHTML = 'Gửi Lưu Bút';
         statusDiv.innerHTML = successCount === totalFiles 
-            ? `✅ <b>Thành công!</b> Đã lưu ${successCount}/${totalFiles} file.`
+            ? `✅ <b>Thành công!</b> Đã lưu ${successCount}/${totalFiles} file. Hẹn bạn một ngày nào đó trong tương lai`
             : `⚠️ <b>Hoàn tất một phần.</b> Đã lưu ${successCount}/${totalFiles} file.`;
         
         if (successCount > 0 || (totalFiles === 0 && textContent !== "")) {
@@ -358,3 +363,4 @@
 </script>
 </body>
 </html>
+
