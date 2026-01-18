@@ -152,8 +152,6 @@
             document.getElementById('classId').disabled = true;
             document.getElementById('userEmail').disabled = true;
             document.getElementById('changeClassBtn').style.display = 'inline';
-            
-            // Kích hoạt tính năng đếm file ngay khi load
             checkExistingMemories(savedClass, savedEmail);
         } else {
             document.getElementById('memory-stats').style.display = 'none';
@@ -167,7 +165,7 @@
         }
     }
 
-    // --- TÍNH NĂNG MỚI: Check số lượng file ---
+    // --- TÍNH NĂNG: Check số lượng file ---
     async function checkExistingMemories(classId, email) {
         const statsDiv = document.getElementById('memory-stats');
         statsDiv.style.display = 'block';
@@ -185,8 +183,6 @@
             if (response.ok) {
                 const text = await response.text();
                 const profile = JSON.parse(text);
-                
-                // Đếm tổng số file trong lịch sử
                 let totalFiles = 0;
                 if (profile.history && Array.isArray(profile.history)) {
                     profile.history.forEach(session => {
@@ -195,14 +191,12 @@
                         }
                     });
                 }
-                
                 statsDiv.innerHTML = `Bạn đang lưu giữ <strong>${totalFiles}</strong> kỷ niệm tại đây.`;
             } else {
-                // Nếu chưa có file profile (người dùng mới)
                 statsDiv.innerHTML = `Chào bạn mới! Bạn chưa có kỷ niệm nào.`;
             }
         } catch (e) {
-            statsDiv.style.display = 'none'; // Ẩn nếu lỗi mạng
+            statsDiv.style.display = 'none';
         }
     }
 
@@ -221,7 +215,7 @@
         fileCountSpan.textContent = this.files.length > 0 ? `Đã chọn ${this.files.length} file` : '';
     });
 
-    // --- 4. Logic Upload Chính (Có cập nhật lại số đếm sau khi up xong) ---
+    // --- 4. Logic Upload Chính (CẢI TIẾN: Upload xong mới lưu JSON) ---
     async function submitConfession() {
         if (WORKER_URL.includes("Dien-URL")) { alert("⚠️ Bạn chưa điền WORKER_URL trong code!"); return; }
 
@@ -246,7 +240,7 @@
         const folderPath = `/Confession/${safeClassId}/${email}`;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
-        // --- BƯỚC 1: LỌC FILE ---
+        // --- BƯỚC 1: LỌC FILE HỢP LỆ ---
         let fileQueue = [];
         for (let i = 0; i < files.length; i++) {
             if (files[i].size > 100 * 1024 * 1024) {
@@ -255,51 +249,66 @@
             }
             const safeName = sanitizeFilename(files[i].name);
             const finalName = `${timestamp}_${safeName}`;
+            // Tạo đối tượng file mới với tên đã đổi
             fileQueue.push(new File([files[i]], finalName, {type: files[i].type}));
         }
 
-        // --- BƯỚC 2: CẬP NHẬT JSON ---
-        statusDiv.innerHTML = "🔄 Đang khởi tạo hồ sơ...";
-        const currentSession = { uploaded_at: new Date().toISOString(), note: textContent, files: fileQueue.map(f => f.name) };
-        
-        await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
+        // --- BƯỚC 2: UPLOAD MEDIA TRƯỚC (QUAN TRỌNG) ---
+        let successfulFileNames = []; // Chỉ chứa tên file đã upload thành công
+        let totalFiles = fileQueue.length;
+        let uploadCount = 0;
 
-        if (fileQueue.length > 0) {
-            statusDiv.innerHTML = "⏳ Đang đồng bộ thư mục mới...";
-            await new Promise(resolve => setTimeout(resolve, 5000)); // Chờ 5 giây để Dropbox đồng bộ thư mục
+        if (totalFiles > 0) {
+            statusDiv.innerHTML = "🚀 Đang bắt đầu tải lên...";
+            
+            for (let i = 0; i < totalFiles; i++) {
+                const file = fileQueue[i];
+                statusDiv.innerHTML = `Đang tải: ${file.name} (${i+1}/${totalFiles})...`;
+                
+                // Upload file
+                const result = await uploadToDropboxWithRetry(file, folderPath, 5);
+                
+                if (result) {
+                    successfulFileNames.push(file.name); // Chỉ push nếu thành công
+                    uploadCount++;
+                }
+                
+                await new Promise(r => setTimeout(r, 1000)); // Nghỉ nhẹ để tránh spam API
+            }
         }
 
-        // --- BƯỚC 3: UPLOAD MEDIA ---
-        let successCount = 0;
-        let totalFiles = fileQueue.length;
-
-        for (let i = 0; i < totalFiles; i++) {
-            const file = fileQueue[i];
-            statusDiv.innerHTML = `Đang tải: ${file.name} (${i+1}/${totalFiles})...`;
-            const result = await uploadToDropboxWithRetry(file, folderPath, 5);
-            if (result) successCount++;
-            await new Promise(r => setTimeout(r, 2000)); // Nghỉ 2 giây giữa các lần upload
+        // --- BƯỚC 3: CẬP NHẬT JSON SAU CÙNG ---
+        // Chỉ cập nhật JSON nếu có file thành công HOẶC có lời nhắn text
+        if (successfulFileNames.length > 0 || textContent !== "") {
+            statusDiv.innerHTML = "📝 Đang ghi vào lưu bút...";
+            
+            // Dùng danh sách successfulFileNames thay vì toàn bộ danh sách
+            const currentSession = { 
+                uploaded_at: new Date().toISOString(), 
+                note: textContent, 
+                files: successfulFileNames 
+            };
+            
+            await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
+            
+            statusDiv.innerHTML = `✅ <b>Hoàn tất!</b> Đã lưu thành công ${uploadCount}/${totalFiles} file.`;
+            
+            // Reload lại thống kê
+            checkExistingMemories(classId, email);
+            resetForm();
+        } else {
+             statusDiv.innerHTML = `❌ <b>Lỗi!</b> Không có file nào được tải lên thành công.`;
         }
 
         // --- KẾT THÚC ---
         btn.disabled = false;
         btn.innerHTML = 'Gửi Lưu Bút';
-        statusDiv.innerHTML = successCount === totalFiles 
-            ? `✅ <b>Thành công!</b> Đã lưu ${successCount}/${totalFiles} file.`
-            : `⚠️ <b>Hoàn tất một phần.</b> Đã lưu ${successCount}/${totalFiles} file.`;
-        
-        if (successCount > 0 || (totalFiles === 0 && textContent !== "")) {
-            // Cập nhật lại số đếm file ngay lập tức
-            checkExistingMemories(classId, email);
-            resetForm();
-        }
     }
 
     function resetForm() {
         document.getElementById('confessionText').value = "";
         fileInput.value = "";
         fileCountSpan.textContent = "";
-        // Không gọi lại loadUserData để tránh reset khung thông báo
     }
 
     // --- Helper: Update JSON ---
