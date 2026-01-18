@@ -6,7 +6,6 @@
     <title>Nơi Lưu Giữ Kỷ Niệm</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- CSS Giao diện Chung --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #1c1e21; }
         .main-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px; }
@@ -29,13 +28,12 @@
         .submit-btn:hover { background-color: #166fe5; }
         .submit-btn:disabled { background-color: #b0c4de; cursor: not-allowed; }
         #status { margin-top: 16px; padding: 12px; background-color: #e7f3ff; border-radius: 8px; font-size: 0.9rem; white-space: pre-line; display: none; color: #0c5460; }
-        
-        /* CSS Mới cho phần thống kê */
-        #memory-stats {
-            text-align: center; font-size: 0.9rem; color: #65676b; margin-bottom: 15px;
-            background: #f0f2f5; padding: 8px; border-radius: 6px; display: none;
-        }
+        #memory-stats { text-align: center; font-size: 0.9rem; color: #65676b; margin-bottom: 15px; background: #f0f2f5; padding: 8px; border-radius: 6px; display: none; }
         #memory-stats strong { color: #1877f2; }
+        
+        /* Progress Bar */
+        .progress-container { width: 100%; background: #e4e6eb; border-radius: 8px; height: 8px; margin: 10px 0; overflow: hidden; display: none; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #1877f2, #42b72a); transition: width 0.3s; width: 0%; }
 
         footer { width: 100%; text-align: center; padding: 20px; font-size: 0.85rem; color: #65676b; background: #fff; border-top: 1px solid #e4e6eb; margin-top: 20px; }
         footer a { color: #1877f2; text-decoration: none; font-weight: 600; cursor: pointer; }
@@ -116,6 +114,11 @@
             </label>
             <span id="fileCount"></span>
             <input type="file" id="fileInput" multiple accept="image/*,video/*">
+            
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
             <button class="submit-btn" id="uploadBtn" onclick="submitConfession()">Gửi Lưu Bút</button>
             <div id="status"></div>
         </div>
@@ -123,9 +126,9 @@
 </div>
 
 <footer>
-    <div>&copy;Archive System 2026 v3</div>
+    <div>&copy;Archive System 2026 v3.5 (Optimized)</div>
     <div style="margin-top: 8px;">
-        Liên hệ Admin: <a href="mailto:admin@email.com">Gửi Mail</a> | 
+        Liên hệ Admin: <a href="mailtophucphamxuan1234@gmail.com">Gửi Mail</a> | 
         <a onclick="openModal('privacyModal')">Chính sách Quyền riêng tư</a>
     </div>
 </footer>
@@ -133,6 +136,7 @@
 <script>
     // --- CẤU HÌNH WORKER ---
     const WORKER_URL = 'https://upload-proxy.phucphamxuan1234.workers.dev'; 
+    const PARALLEL_UPLOADS = 3; // Upload song song 3 file cùng lúc
 
     // --- 1. Xử lý Popup & Giao diện ---
     window.onload = function() {
@@ -215,9 +219,58 @@
         fileCountSpan.textContent = this.files.length > 0 ? `Đã chọn ${this.files.length} file` : '';
     });
 
-    // --- 4. Logic Upload Chính (CẢI TIẾN: Upload xong mới lưu JSON) ---
+    // --- 4. KHỞI TẠO FOLDER (FIX LỖI LẦN ĐẦU) ---
+    async function ensureFolderExists(folderPath) {
+        try {
+            // Thử tạo folder (nếu đã tồn tại sẽ trả về lỗi nhưng không sao)
+            await fetch(WORKER_URL + '/create_folder', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: folderPath })
+            });
+            return true;
+        } catch (e) {
+            // Bỏ qua lỗi nếu folder đã tồn tại
+            return true;
+        }
+    }
+
+    // --- 5. UPLOAD SONG SONG (TỐI ƯU TỐC ĐỘ) ---
+    async function uploadFilesInParallel(files, folderPath, onProgress) {
+        const results = [];
+        const queue = [...files];
+        let completed = 0;
+        
+        async function uploadWorker() {
+            while (queue.length > 0) {
+                const file = queue.shift();
+                if (!file) break;
+                
+                const result = await uploadToDropboxWithRetry(file, folderPath, 5);
+                results.push({ file: file.name, success: result });
+                completed++;
+                
+                if (onProgress) {
+                    onProgress(completed, files.length);
+                }
+            }
+        }
+        
+        // Chạy song song PARALLEL_UPLOADS worker
+        const workers = Array(Math.min(PARALLEL_UPLOADS, files.length))
+            .fill(null)
+            .map(() => uploadWorker());
+        
+        await Promise.all(workers);
+        return results;
+    }
+
+    // --- 6. Logic Upload Chính (CẢI TIẾN: Upload song song + Khởi tạo folder) ---
     async function submitConfession() {
-        if (WORKER_URL.includes("Dien-URL")) { alert("⚠️ Bạn chưa điền WORKER_URL trong code!"); return; }
+        if (WORKER_URL.includes("Dien-URL")) { 
+            alert("⚠️ Bạn chưa điền WORKER_URL trong code!"); 
+            return; 
+        }
 
         const classId = document.getElementById('classId').value.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-');
         const email = document.getElementById('userEmail').value.trim().toLowerCase();
@@ -225,9 +278,17 @@
         const files = fileInput.files;
         const btn = document.getElementById('uploadBtn');
         const statusDiv = document.getElementById('status');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
 
-        if (!classId || !email) { alert("⚠️ Vui lòng nhập Tên Lớp và Email!"); return; }
-        if (files.length === 0 && textContent === "") { alert("⚠️ Hãy chọn ảnh hoặc viết lời nhắn!"); return; }
+        if (!classId || !email) { 
+            alert("⚠️ Vui lòng nhập Tên Lớp và Email!"); 
+            return; 
+        }
+        if (files.length === 0 && textContent === "") { 
+            alert("⚠️ Hãy chọn ảnh hoặc viết lời nhắn!"); 
+            return; 
+        }
 
         localStorage.setItem('user_class', classId);
         localStorage.setItem('user_email', email);
@@ -235,10 +296,16 @@
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
         statusDiv.style.display = 'block';
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
         
         const safeClassId = classId.replace(/\//g, '-');
         const folderPath = `/Confession/${safeClassId}/${email}`;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+
+        // --- BƯỚC 0: ĐẢM BẢO FOLDER TỒN TẠI (FIX LỖI LẦN ĐẦU) ---
+        statusDiv.innerHTML = "📁 Đang khởi tạo thư mục...";
+        await ensureFolderExists(folderPath);
 
         // --- BƯỚC 1: LỌC FILE HỢP LỆ ---
         let fileQueue = [];
@@ -249,40 +316,33 @@
             }
             const safeName = sanitizeFilename(files[i].name);
             const finalName = `${timestamp}_${safeName}`;
-            // Tạo đối tượng file mới với tên đã đổi
             fileQueue.push(new File([files[i]], finalName, {type: files[i].type}));
         }
 
-        // --- BƯỚC 2: UPLOAD MEDIA TRƯỚC (QUAN TRỌNG) ---
-        let successfulFileNames = []; // Chỉ chứa tên file đã upload thành công
+        // --- BƯỚC 2: UPLOAD SONG SONG (QUAN TRỌNG) ---
+        let successfulFileNames = [];
         let totalFiles = fileQueue.length;
-        let uploadCount = 0;
 
         if (totalFiles > 0) {
-            statusDiv.innerHTML = "🚀 Đang bắt đầu tải lên...";
+            statusDiv.innerHTML = "🚀 Đang tải lên song song...";
             
-            for (let i = 0; i < totalFiles; i++) {
-                const file = fileQueue[i];
-                statusDiv.innerHTML = `Đang tải: ${file.name} (${i+1}/${totalFiles})...`;
-                
-                // Upload file
-                const result = await uploadToDropboxWithRetry(file, folderPath, 5);
-                
-                if (result) {
-                    successfulFileNames.push(file.name); // Chỉ push nếu thành công
-                    uploadCount++;
-                }
-                
-                await new Promise(r => setTimeout(r, 1000)); // Nghỉ nhẹ để tránh spam API
-            }
+            const results = await uploadFilesInParallel(fileQueue, folderPath, (completed, total) => {
+                const percent = Math.round((completed / total) * 100);
+                progressBar.style.width = percent + '%';
+                statusDiv.innerHTML = `📤 Đang tải: ${completed}/${total} files (${percent}%)`;
+            });
+            
+            // Lọc file thành công
+            successfulFileNames = results
+                .filter(r => r.success)
+                .map(r => r.file);
         }
 
         // --- BƯỚC 3: CẬP NHẬT JSON SAU CÙNG ---
-        // Chỉ cập nhật JSON nếu có file thành công HOẶC có lời nhắn text
         if (successfulFileNames.length > 0 || textContent !== "") {
+            progressBar.style.width = '95%';
             statusDiv.innerHTML = "📝 Đang ghi vào lưu bút...";
             
-            // Dùng danh sách successfulFileNames thay vì toàn bộ danh sách
             const currentSession = { 
                 uploaded_at: new Date().toISOString(), 
                 note: textContent, 
@@ -291,16 +351,21 @@
             
             await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
             
-            statusDiv.innerHTML = `✅ <b>Hoàn tất!</b> Đã lưu thành công ${uploadCount}/${totalFiles} file.`;
+            progressBar.style.width = '100%';
+            statusDiv.innerHTML = `✅ <b>Hoàn tất!</b> Đã lưu thành công ${successfulFileNames.length}/${totalFiles} file.`;
             
-            // Reload lại thống kê
             checkExistingMemories(classId, email);
             resetForm();
+            
+            setTimeout(() => {
+                progressContainer.style.display = 'none';
+                progressBar.style.width = '0%';
+            }, 3000);
         } else {
              statusDiv.innerHTML = `❌ <b>Lỗi!</b> Không có file nào được tải lên thành công.`;
+             progressContainer.style.display = 'none';
         }
 
-        // --- KẾT THÚC ---
         btn.disabled = false;
         btn.innerHTML = 'Gửi Lưu Bút';
     }
@@ -311,19 +376,36 @@
         fileCountSpan.textContent = "";
     }
 
-    // --- Helper: Update JSON ---
+    // --- Helper: Update JSON với Exponential Backoff ---
     async function updateProfileJsonWithRetry(folderPath, email, classId, sessionData) {
-        let retries = 3;
+        let retries = 5;
+        let delay = 1000;
+        
         while (retries > 0) {
-            try { return await updateProfileJson(folderPath, email, classId, sessionData); }
-            catch (e) { console.warn("Lỗi JSON, thử lại...", e); retries--; await new Promise(r => setTimeout(r, 1000)); }
+            try { 
+                return await updateProfileJson(folderPath, email, classId, sessionData); 
+            } catch (e) { 
+                console.warn(`Lỗi JSON, thử lại... (${retries} lần còn lại)`, e); 
+                retries--; 
+                if (retries > 0) {
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2; // Exponential backoff
+                }
+            }
         }
+        throw new Error("Không thể cập nhật JSON sau nhiều lần thử");
     }
 
     async function updateProfileJson(folderPath, email, classId, sessionData) {
         const jsonFileName = "profile.json";
         const fullPath = `${folderPath}/${jsonFileName}`;
-        let profile = { user_email: email, user_class: classId, created_at: new Date().toISOString(), last_updated: new Date().toISOString(), history: [] };
+        let profile = { 
+            user_email: email, 
+            user_class: classId, 
+            created_at: new Date().toISOString(), 
+            last_updated: new Date().toISOString(), 
+            history: [] 
+        };
 
         try {
             const downloadResp = await fetch(WORKER_URL + '/download', {
@@ -334,7 +416,9 @@
                 const text = await downloadResp.text();
                 profile = JSON.parse(text);
             }
-        } catch (e) {}
+        } catch (e) {
+            console.log("JSON chưa tồn tại, tạo mới");
+        }
 
         profile.history.push(sessionData);
         profile.last_updated = new Date().toISOString();
@@ -342,27 +426,60 @@
         const jsonFile = new File([JSON.stringify(profile, null, 2)], jsonFileName, { type: 'application/json' });
         const args = { "path": fullPath, "mode": "overwrite", "autorename": false, "mute": true };
 
-        await fetch(WORKER_URL + '/upload', {
+        const uploadResp = await fetch(WORKER_URL + '/upload', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/octet-stream', 'Dropbox-API-Arg': JSON.stringify(args) },
+            headers: { 
+                'Content-Type': 'application/octet-stream', 
+                'Dropbox-API-Arg': JSON.stringify(args) 
+            },
             body: jsonFile
         });
+        
+        if (!uploadResp.ok) {
+            throw new Error(`Upload JSON failed: ${uploadResp.status}`);
+        }
     }
 
-    // --- Helper: Upload File ---
-    async function uploadToDropboxWithRetry(file, folderPath, maxRetries = 3) {
+    // --- Helper: Upload File với Exponential Backoff ---
+    async function uploadToDropboxWithRetry(file, folderPath, maxRetries = 5) {
+        let delay = 1000;
+        
         for (let i = 0; i < maxRetries; i++) {
             try {
                 const fullPath = `${folderPath}/${file.name}`;
-                const args = { "path": fullPath, "mode": "add", "autorename": true, "mute": false };
+                const args = { 
+                    "path": fullPath, 
+                    "mode": "add", 
+                    "autorename": true, 
+                    "mute": false 
+                };
+                
                 const response = await fetch(WORKER_URL + '/upload', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/octet-stream', 'Dropbox-API-Arg': JSON.stringify(args) },
+                    headers: { 
+                        'Content-Type': 'application/octet-stream', 
+                        'Dropbox-API-Arg': JSON.stringify(args) 
+                    },
                     body: file
                 });
+                
                 if (response.ok) return true;
-                if (response.status >= 500) throw new Error("Server Error");
-            } catch (error) { await new Promise(r => setTimeout(r, 1500)); }
+                
+                // Nếu lỗi 5xx thì retry
+                if (response.status >= 500) {
+                    throw new Error("Server Error");
+                } else {
+                    // Lỗi khác thì dừng ngay
+                    console.error(`Upload failed for ${file.name}: ${response.status}`);
+                    return false;
+                }
+            } catch (error) { 
+                console.warn(`Retry ${i+1}/${maxRetries} for ${file.name}`);
+                if (i < maxRetries - 1) {
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2; // Exponential backoff
+                }
+            }
         }
         return false;
     }
