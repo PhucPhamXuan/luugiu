@@ -8,123 +8,40 @@
     <style>
         /* --- CSS Giao diện Chung --- */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            flex-direction: column; /* Để footer nằm dưới */
-            align-items: center;
-            min-height: 100vh;
-            color: #1c1e21;
-        }
-
-        /* Container chính */
-        .main-wrapper {
-            flex: 1; /* Đẩy footer xuống đáy */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 10px;
-        }
-
-        .confession-box {
-            background: white; width: 100%; max-width: 500px;
-            border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            overflow: hidden; position: relative;
-        }
-        
-        .header { 
-            padding: 16px; border-bottom: 1px solid #e4e6eb; 
-            text-align: center; font-weight: bold; font-size: 1.3rem; color: #1877f2; 
-        }
-        
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #1c1e21; }
+        .main-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px; }
+        .confession-box { background: white; width: 100%; max-width: 500px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); overflow: hidden; position: relative; }
+        .header { padding: 16px; border-bottom: 1px solid #e4e6eb; text-align: center; font-weight: bold; font-size: 1.3rem; color: #1877f2; }
         .content-area { padding: 16px; }
-        
-        /* Input Styles */
         .input-group { margin-bottom: 12px; position: relative; }
         .input-group label { display: block; font-size: 0.9rem; color: #1c1e21; margin-bottom: 6px; font-weight: 600;}
-        .input-field { 
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; 
-            font-size: 1rem; outline: none; transition: border 0.2s, background 0.2s; 
-        }
+        .input-field { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; transition: border 0.2s, background 0.2s; }
         .input-field:focus { border-color: #1877f2; }
         .input-field:disabled { background-color: #f0f2f5; color: #65676b; cursor: not-allowed; }
-
-        /* Nút đổi thông tin */
-        .change-info-btn {
-            position: absolute; right: 0; top: 0;
-            font-size: 0.8rem; color: #1877f2; cursor: pointer;
-            text-decoration: underline; display: none; /* Ẩn mặc định */
-        }
-
-        textarea.confession-text { 
-            width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; 
-            resize: none; font-size: 1rem; min-height: 100px; outline: none; margin-bottom: 10px; font-family: inherit; 
-        }
-
-        /* Nút Upload */
+        .change-info-btn { position: absolute; right: 0; top: 0; font-size: 0.8rem; color: #1877f2; cursor: pointer; text-decoration: underline; display: none; }
+        textarea.confession-text { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; resize: none; font-size: 1rem; min-height: 100px; outline: none; margin-bottom: 10px; font-family: inherit; }
         #fileInput { display: none; }
-        .media-upload-btn { 
-            display: flex; justify-content: center; align-items: center; padding: 15px; 
-            background-color: #f7f8fa; border: 1px dashed #ccd0d5; color: #606770; 
-            border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; margin-bottom: 10px; 
-        }
+        .media-upload-btn { display: flex; justify-content: center; align-items: center; padding: 15px; background-color: #f7f8fa; border: 1px dashed #ccd0d5; color: #606770; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; margin-bottom: 10px; }
         .media-upload-btn:hover { background-color: #ebedf0; }
         .media-upload-btn i { margin-right: 8px; color: #45bd62; font-size: 1.3rem; }
-        
         #fileCount { display: block; text-align: center; font-size: 0.9rem; color: #1877f2; margin-bottom: 15px; font-weight: bold;}
-
-        .submit-btn { 
-            width: 100%; padding: 14px; background-color: #1877f2; color: white; 
-            border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; 
-            cursor: pointer; transition: background 0.2s; 
-        }
+        .submit-btn { width: 100%; padding: 14px; background-color: #1877f2; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .submit-btn:hover { background-color: #166fe5; }
         .submit-btn:disabled { background-color: #b0c4de; cursor: not-allowed; }
-
-        #status { 
-            margin-top: 16px; padding: 12px; background-color: #e7f3ff; 
-            border-radius: 8px; font-size: 0.9rem; white-space: pre-line; display: none; color: #0c5460; 
-        }
-        
-        /* --- Footer --- */
-        footer {
-            width: 100%; text-align: center; padding: 20px; font-size: 0.85rem; color: #65676b;
-            background: #fff; border-top: 1px solid #e4e6eb; margin-top: 20px;
-        }
+        #status { margin-top: 16px; padding: 12px; background-color: #e7f3ff; border-radius: 8px; font-size: 0.9rem; white-space: pre-line; display: none; color: #0c5460; }
+        footer { width: 100%; text-align: center; padding: 20px; font-size: 0.85rem; color: #65676b; background: #fff; border-top: 1px solid #e4e6eb; margin-top: 20px; }
         footer a { color: #1877f2; text-decoration: none; font-weight: 600; cursor: pointer; }
         footer a:hover { text-decoration: underline; }
-
-        /* --- Modal Popup Chung (Intro & Privacy) --- */
-        .modal-overlay { 
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; 
-            z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; 
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        
-        .modal-box { 
-            background: white; padding: 25px; border-radius: 12px; 
-            max-width: 90%; width: 450px; text-align: center; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25); 
-            transform: scale(0.9); transition: transform 0.3s ease;
-            max-height: 80vh; overflow-y: auto; /* Để cuộn nếu chính sách dài */
-        }
+        .modal-box { background: white; padding: 25px; border-radius: 12px; max-width: 90%; width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transform: scale(0.9); transition: transform 0.3s ease; max-height: 80vh; overflow-y: auto; }
         .modal-overlay.active .modal-box { transform: scale(1); }
-        
         .modal-icon { font-size: 3rem; color: #1877f2; margin-bottom: 15px; }
         .modal-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 12px; }
         .modal-desc { font-size: 1rem; color: #666; margin-bottom: 25px; line-height: 1.6; text-align: left;}
-        .modal-center-desc { text-align: center; } /* Class phụ cho intro */
-        
-        .modal-btn { 
-            padding: 12px 30px; background: #1877f2; color: white; 
-            border: none; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 1rem;
-        }
+        .modal-center-desc { text-align: center; }
+        .modal-btn { padding: 12px 30px; background: #1877f2; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; }
         .close-modal-top { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; }
-
-        /* Style riêng cho nội dung chính sách */
         .policy-content p { margin-bottom: 10px; }
         .policy-content h4 { margin-top: 15px; margin-bottom: 5px; color: #333; }
     </style>
@@ -169,58 +86,50 @@
 
 <div class="main-wrapper">
     <div class="confession-box">
-        <div class="header">
-             Nơi lưu giữ kỷ niệm
-        </div>
-
+        <div class="header">Nơi lưu giữ kỷ niệm</div>
         <div class="content-area">
             <div class="input-group">
                 <label>Tên Lớp (Ví dụ: 6/1, 8/2,...)</label>
                 <span class="change-info-btn" id="changeClassBtn" onclick="enableEdit()">[Đổi thông tin]</span>
                 <input type="text" class="input-field" id="classId" placeholder="Nhập lớp...">
             </div>
-
             <div class="input-group">
                 <label>Email (Dùng chung cho các lần gửi)</label>
                 <input type="email" class="input-field" id="userEmail" placeholder="Nhập email của bạn...">
             </div>
-
             <div class="input-group">
                  <label>Lời nhắn gửi hoặc mô tả về những bức ảnh bạn đã tải lên</label>
                 <textarea class="confession-text" id="confessionText" placeholder="Kể về kỷ niệm này..."></textarea>
             </div>
-
             <label for="fileInput" class="media-upload-btn">
-                <i class="fas fa-images"></i> Chọn Ảnh/Video (mỗi file tối đa 150MB)
+                <i class="fas fa-images"></i> Chọn Ảnh/Video (Max 100MB/file)
             </label>
             <span id="fileCount"></span>
             <input type="file" id="fileInput" multiple accept="image/*,video/*">
-
             <button class="submit-btn" id="uploadBtn" onclick="submitConfession()">Gửi Lưu Bút</button>
-
             <div id="status"></div>
         </div>
     </div>
 </div>
 
 <footer>
-    <div>Archive System &copy; 2026 - v1.1</div>
+    <div>Archive System &copy;2026 - v2</div>
     <div style="margin-top: 8px;">
-        Liên hệ Admin: <a href="mailto:phucphamxuan1234@gmail.com">Gửi Mail</a> | 
+        Liên hệ Admin: <a href="mailto:admin@email.com">Gửi Mail</a> | 
         <a onclick="openModal('privacyModal')">Chính sách Quyền riêng tư</a>
     </div>
 </footer>
 
 <script>
-    // --- TOKEN CỦA BẠN ---
-    const ACCESS_TOKEN = 'sl.u.AGM5AUHGI6GTISZK_I-XYCwKnQoZxjVLSI4ZDqdbi94C5W7UdPC8VLns_vhA1j25AEhQpITsnOvoUCRnedv2DzHA-v7BB8jpEYY7rSLAhF6-d298Umh_vA3W7pvH40d1bNpyeN7keTLY5dewN706w7ECPc4h9siXUVfcMIh-nQFJ38oddAHG1iJEeLUFIxDXuYIW8r29zAIrOK63CRzbB4-KmwmHRnqrpOrgN_xxvQ7gQLeGjE-Y626QyWDJJggnk_o-e-Mu5ImcvooR61ZRZYLFxeSScgSXPNzjLn8QbX1z8rc5_NdXY25R7H6bgm-g9bnW_CPkXOEbB9LKScvXxxLFwPdacGvAxIoRB2TFbCLgdt-GutfuDegkEvKbFMLK5H33_BOzgYYyDGrNXa0jqD59GtvBJA-ZxkaxHzO0DKtrPYSqIZsxxKIiO_eCD8Eo0mL0emUfbB-nhCxLeViqV5-6hwQrcxIL0poFOIm3KMSYbPV7Rs44MXUY_w_2bVKbj20xvfCpz0mQj180jqTx7O5yfsTVVq7p-y-zwJ2Smemp2XLWAtAVuLRBrFJF8YakMPT165NJgeV3ViUhqdHBa1xEjVAQ40wxXGd7qR4URn1rv-ZrA-SUZKnsPoTigoUtZSrZmi9t-WJ4EAjG3vENF50UPSim6lkskIKQMGqqdKJ7MdAGUDhTWm37GSvgp6cT2EjZOG1hFmeQ3fGEbnPNl-BsM35ckCvHYTkKXAwiwtKNihuu8tfmSQ7XpGoQNcBxw-6bf4SBmKPiX3-P2l3lQUVCc4IKb3pmbOIK3nsSLRHRZRNJDpuiZkcDdbeaMowLOowxMkr0hYUIvQJmCowtNRk6c1bkfuh_diHvLOKzAamrkW-03PDeS8WzvG_0MxQNGHjGiqZZeDvbPkNjG7KZDCxRdtM8ZphwHeA5EhL7RkS2-8FisLMDD7AJ9Gmhx9c_NR7iaRZY8wJvdz-O5iEf0PjP22AFbdZRXsklHdbWWhuteIJkcWINfkUatHJyzAMixztxdGdDIzSieds3OUBd0rxq9CIpiAOt_GJkGgHAmw2OiOmsgroCluS4KGoZuM5UKsSBro7ipji6NNhOKuCwNe3-fIoG-1ngA211sAk9J3EULCtdA7lOkL30F5ivPddrDYIsUTKGF4ahtMqqA3yWIwKp_pL5z8MQM17d2Z_1huUjZNob5zc7iI_8RBwNw5Va-62vZpgjI-rMpbvjPz93lZKKPANHyTc3-Ha7qKBl_jn4drtm8SGRbH-0BSidUHEODczaKUvDJrhKb7ALaUmUpah2Bl4utUHLLG5VwlB3lShjWLPar4pa3jDEpSuCBmu6t9402XEcqKjQqjQe5vGLicAk';
+    // --- CẤU HÌNH WORKER ---
+    // Kiểm tra kỹ URL này phải KHỚP với URL Cloudflare Worker bạn đã tạo
+    const WORKER_URL = 'https://upload-proxy.phucphamxuan1234.workers.dev'; 
 
     // --- 1. Xử lý Popup & Giao diện ---
     window.onload = function() {
         setTimeout(() => { document.getElementById('introModal').classList.add('active'); }, 500);
         loadUserData();
     }
-
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
@@ -229,50 +138,40 @@
         const savedClass = localStorage.getItem('user_class');
         const savedEmail = localStorage.getItem('user_email');
         if (savedClass && savedEmail) {
-            const classInput = document.getElementById('classId');
-            const emailInput = document.getElementById('userEmail');
-            classInput.value = savedClass;
-            emailInput.value = savedEmail;
-            classInput.disabled = true;
-            emailInput.disabled = true;
+            document.getElementById('classId').value = savedClass;
+            document.getElementById('userEmail').value = savedEmail;
+            document.getElementById('classId').disabled = true;
+            document.getElementById('userEmail').disabled = true;
             document.getElementById('changeClassBtn').style.display = 'inline';
         }
     }
-
     function enableEdit() {
-        if (confirm("Bạn có muốn xóa thông tin đã lưu để nhập thông tin mới không?")) {
-            const classInput = document.getElementById('classId');
-            const emailInput = document.getElementById('userEmail');
-            classInput.disabled = false;
-            emailInput.disabled = false;
-            classInput.value = "";
-            emailInput.value = "";
+        if (confirm("Xóa thông tin cũ để nhập lại?")) {
             localStorage.removeItem('user_class');
             localStorage.removeItem('user_email');
-            document.getElementById('changeClassBtn').style.display = 'none';
-            classInput.focus();
+            location.reload();
         }
     }
 
-    // --- Helper: Xóa dấu Tiếng Việt và ký tự lạ ---
-    // Hàm này cực kỳ quan trọng để fix lỗi trên mobile
+    // --- Helper: Xóa dấu Tiếng Việt (Quan trọng cho mobile) ---
     function sanitizeFilename(str) {
         return str.normalize('NFD')
                   .replace(/[\u0300-\u036f]/g, '')
                   .replace(/đ/g, 'd').replace(/Đ/g, 'D')
-                  .replace(/[^a-zA-Z0-9._-]/g, '_'); // Chỉ giữ lại chữ không dấu, số, và dấu chấm/gạch
+                  .replace(/[^a-zA-Z0-9._-]/g, '_');
     }
 
     // --- 3. Xử lý File Input ---
     const fileInput = document.getElementById('fileInput');
     const fileCountSpan = document.getElementById('fileCount');
     fileInput.addEventListener('change', function() {
-        if (this.files.length > 0) fileCountSpan.textContent = `Đã chọn ${this.files.length} file`;
-        else fileCountSpan.textContent = '';
+        fileCountSpan.textContent = this.files.length > 0 ? `Đã chọn ${this.files.length} file` : '';
     });
 
-    // --- 4. Logic Upload Chính ---
+    // --- 4. Logic Upload Chính (Qua Cloudflare Worker) ---
     async function submitConfession() {
+        if (WORKER_URL.includes("Dien-URL")) { alert("⚠️ Bạn chưa điền WORKER_URL trong code!"); return; }
+
         const classId = document.getElementById('classId').value.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-');
         const email = document.getElementById('userEmail').value.trim().toLowerCase();
         const textContent = document.getElementById('confessionText').value.trim();
@@ -294,40 +193,33 @@
         const folderPath = `/Confession/${safeClassId}/${email}`;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
-        // --- BƯỚC 1: CHUẨN BỊ DANH SÁCH FILE AN TOÀN ---
-        // Đổi tên file sang dạng không dấu ngay từ đầu
+        // --- BƯỚC 1: LỌC FILE & ĐỔI TÊN ---
         let fileQueue = [];
         for (let i = 0; i < files.length; i++) {
-            // Kiểm tra dung lượng 150MB (Dropbox API upload session limit)
-            if (files[i].size > 150 * 1024 * 1024) {
-                alert(`⚠️ File "${files[i].name}" lớn hơn 150MB và sẽ bị bỏ qua.`);
+            // Check 100MB cho Cloudflare Free
+            if (files[i].size > 100 * 1024 * 1024) {
+                alert(`⚠️ File "${files[i].name}" lớn hơn 100MB (giới hạn Cloudflare) nên sẽ bị bỏ qua.`);
                 continue;
             }
-            
-            const originalName = files[i].name;
-            const safeName = sanitizeFilename(originalName);
+            const safeName = sanitizeFilename(files[i].name);
             const finalName = `${timestamp}_${safeName}`;
-            
-            // Tạo file mới với tên an toàn
-            const renamedFile = new File([files[i]], finalName, {type: files[i].type});
-            fileQueue.push(renamedFile);
+            fileQueue.push(new File([files[i]], finalName, {type: files[i].type}));
         }
 
-        // --- BƯỚC 2: CẬP NHẬT PROFILE.JSON ---
-        statusDiv.innerHTML = "🔄 Đang lưu hồ sơ...";
+        // --- BƯỚC 2: CẬP NHẬT JSON (TẠO FOLDER) ---
+        statusDiv.innerHTML = "🔄 Đang khởi tạo hồ sơ...";
+        const currentSession = { uploaded_at: new Date().toISOString(), note: textContent, files: fileQueue.map(f => f.name) };
         
-        // Tạo list tên file để lưu vào json
-        let uploadedFilesNames = fileQueue.map(f => f.name);
-        const currentSession = {
-            uploaded_at: new Date().toISOString(),
-            note: textContent,
-            files: uploadedFilesNames
-        };
-
-        // Retry cho file json luôn để chắc chắn folder được tạo
+        // Upload file JSON trước để Dropbox tạo thư mục
         await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
 
-        // --- BƯỚC 3: UPLOAD MEDIA VỚI RETRY ---
+        // --- [FIX LỖI] Đợi 2 giây để Dropbox kịp nhận diện folder mới ---
+        if (fileQueue.length > 0) {
+            statusDiv.innerHTML = "⏳ Đang đồng bộ thư mục mới...";
+            await new Promise(resolve => setTimeout(resolve, 2000)); 
+        }
+
+        // --- BƯỚC 3: UPLOAD MEDIA ---
         let successCount = 0;
         let totalFiles = fileQueue.length;
 
@@ -335,32 +227,23 @@
             const file = fileQueue[i];
             statusDiv.innerHTML = `Đang tải: ${file.name} (${i+1}/${totalFiles})...`;
             
-            // Thử upload tối đa 3 lần
-            const result = await uploadToDropboxWithRetry(file, folderPath, 3);
+            // Retry 5 lần nếu lỗi
+            const result = await uploadToDropboxWithRetry(file, folderPath, 5);
             
-            if (result) {
-                successCount++;
-            } else {
-                console.error(`Thất bại file: ${file.name}`);
-            }
+            if (result) successCount++;
+            
+            // --- [FIX LỖI] Nghỉ 0.5s giữa các file để tránh nghẽn mạng ---
+            await new Promise(r => setTimeout(r, 500));
         }
 
         // --- KẾT THÚC ---
         btn.disabled = false;
         btn.innerHTML = 'Gửi Lưu Bút';
+        statusDiv.innerHTML = successCount === totalFiles 
+            ? `✅ <b>Thành công!</b> Đã lưu ${successCount}/${totalFiles} file.`
+            : `⚠️ <b>Hoàn tất một phần.</b> Đã lưu ${successCount}/${totalFiles} file.`;
         
-        if (successCount === totalFiles && totalFiles > 0) {
-            statusDiv.innerHTML = `✅ <b>Thành công tuyệt đối!</b>\nĐã lưu đủ ${successCount}/${totalFiles} file.`;
-            resetForm();
-        } else if (successCount > 0) {
-            statusDiv.innerHTML = `⚠️ <b>Hoàn tất một phần</b>\nĐã lưu được ${successCount}/${totalFiles} file.\n(Có thể do mạng yếu, hãy thử gửi lại các file chưa lên).`;
-            resetForm(); // Vẫn reset form vì đã có file lên
-        } else if (totalFiles === 0 && textContent !== "") {
-            statusDiv.innerHTML = `✅ <b>Đã lưu lời nhắn thành công!</b>`;
-            resetForm();
-        } else {
-            statusDiv.innerHTML = `❌ <b>Lỗi kết nối</b>. Vui lòng kiểm tra mạng và thử lại.`;
-        }
+        if (successCount > 0 || (totalFiles === 0 && textContent !== "")) resetForm();
     }
 
     function resetForm() {
@@ -370,100 +253,72 @@
         loadUserData();
     }
 
-    // --- Helper: Update JSON có Retry ---
+    // --- Helper: Update JSON ---
     async function updateProfileJsonWithRetry(folderPath, email, classId, sessionData) {
         let retries = 3;
         while (retries > 0) {
-            try {
-                await updateProfileJson(folderPath, email, classId, sessionData);
-                return; // Thành công
-            } catch (e) {
-                console.warn("Lỗi update JSON, thử lại...", e);
-                retries--;
-                await new Promise(r => setTimeout(r, 1000)); // Đợi 1s
-            }
+            try { return await updateProfileJson(folderPath, email, classId, sessionData); }
+            catch (e) { console.warn("Lỗi JSON, thử lại...", e); retries--; await new Promise(r => setTimeout(r, 1000)); }
         }
     }
 
     async function updateProfileJson(folderPath, email, classId, sessionData) {
         const jsonFileName = "profile.json";
         const fullPath = `${folderPath}/${jsonFileName}`;
-        let profile = {
-            user_email: email,
-            user_class: classId,
-            created_at: new Date().toISOString(),
-            last_updated: new Date().toISOString(),
-            history: []
-        };
+        let profile = { user_email: email, user_class: classId, created_at: new Date().toISOString(), last_updated: new Date().toISOString(), history: [] };
 
-        // 1. Thử download file cũ (nếu có)
         try {
-            const downloadResp = await fetch('https://content.dropboxapi.com/2/files/download', {
+            const downloadResp = await fetch(WORKER_URL + '/download', {
                 method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + ACCESS_TOKEN, 'Dropbox-API-Arg': JSON.stringify({ "path": fullPath }) }
+                headers: { 'Dropbox-API-Arg': JSON.stringify({ "path": fullPath }) }
             });
-
             if (downloadResp.ok) {
-                const text = await downloadResp.text(); // Dùng text() an toàn hơn blob() cho JSON
+                const text = await downloadResp.text();
                 profile = JSON.parse(text);
             }
-        } catch (e) { /* File chưa tồn tại, bỏ qua */ }
+        } catch (e) {}
 
-        // 2. Cập nhật data mới
         profile.history.push(sessionData);
         profile.last_updated = new Date().toISOString();
 
-        // 3. Upload lại (Overwrite)
         const jsonFile = new File([JSON.stringify(profile, null, 2)], jsonFileName, { type: 'application/json' });
         const args = { "path": fullPath, "mode": "overwrite", "autorename": false, "mute": true };
 
-        const uploadResp = await fetch('https://content.dropboxapi.com/2/files/upload', {
+        await fetch(WORKER_URL + '/upload', {
             method: 'POST',
             headers: {
-                'Authorization': 'Bearer ' + ACCESS_TOKEN,
                 'Content-Type': 'application/octet-stream',
                 'Dropbox-API-Arg': JSON.stringify(args)
             },
             body: jsonFile
         });
-        
-        if (!uploadResp.ok) throw new Error("JSON Upload failed");
     }
 
-    // --- Helper: Upload File có Retry ---
+    // --- Helper: Upload File ---
     async function uploadToDropboxWithRetry(file, folderPath, maxRetries = 3) {
         for (let i = 0; i < maxRetries; i++) {
             try {
-                // Kiểm tra lại file size lần cuối
                 const fullPath = `${folderPath}/${file.name}`;
-                // Quan trọng: Dropbox API yêu cầu Header phải là ASCII. 
-                // Hàm sanitizeFilename ở trên đã xử lý tên file, nên ở đây JSON.stringify sẽ an toàn.
-                
                 const args = { "path": fullPath, "mode": "add", "autorename": true, "mute": false };
                 
-                const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+                const response = await fetch(WORKER_URL + '/upload', {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer ' + ACCESS_TOKEN,
                         'Content-Type': 'application/octet-stream',
                         'Dropbox-API-Arg': JSON.stringify(args)
                     },
                     body: file
                 });
 
-                if (response.ok) return true; // Thành công
-                
-                // Nếu lỗi server (5xx) thì thử lại, lỗi client (4xx) thì có thể dừng
+                if (response.ok) return true;
                 if (response.status >= 500) throw new Error("Server Error");
-                
             } catch (error) {
-                console.warn(`Lỗi upload lần ${i+1}, đang thử lại...`, error);
-                await new Promise(r => setTimeout(r, 1500)); // Đợi 1.5s trước khi thử lại
+                console.warn(`Lỗi upload lần ${i+1}, thử lại...`, error);
+                await new Promise(r => setTimeout(r, 1500));
             }
         }
-        return false; // Thất bại sau 3 lần
+        return false;
     }
 </script>
-
 </body>
 </html>
