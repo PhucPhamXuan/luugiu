@@ -134,9 +134,15 @@
 </footer>
 
 <script>
-    // --- CẤU HÌNH WORKER ---
+// --- CẤU HÌNH WORKER ---
     const WORKER_URL = 'https://upload-proxy.phucphamxuan1234.workers.dev'; 
-    const PARALLEL_UPLOADS = 3; // Upload song song 3 file cùng lúc
+    
+    // TỰ ĐỘNG PHÁT HIỆN MOBILE
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    // Nếu là Mobile: Chỉ upload 1 file/lần (để dồn toàn bộ băng thông cho file đó, tránh timeout)
+    // Nếu là PC: Upload 3 file/lần
+    const PARALLEL_UPLOADS = isMobile ? 1 : 3;
 
     // --- 1. Xử lý Popup & Giao diện ---
     window.onload = function() {
