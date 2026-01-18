@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Nơi Lưu Giữ Kỷ Niệm</title>
+    <title>Nơi Lưu Giữ Kỷ Niệm (Testing Mode)</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* GIỮ NGUYÊN CSS CŨ */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #1c1e21; }
         .main-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px; }
@@ -61,7 +62,7 @@
         <div class="modal-desc modal-center-desc">
             Bạn có thể upload ảnh và video kỷ niệm của mình lên đây.<br>
             Tất cả kỷ niệm của bạn sẽ được gom gọn vào một hồ sơ duy nhất để gửi lại cho bạn sau này.<br><br>
-            Mỗi file tối đa <b>100MB</b> (Giới hạn Cloudflare), nếu file lớn hơn hãy liên hệ admin nhé!<br>
+            Mỗi file tối đa <b>100MB</b>, nếu file lớn hơn hãy liên hệ admin nhé!<br>
             <br><br>Trước khi bắt đầu, vui lòng đọc kỹ <b><a onclick="openModal('privacyModal')">Chính sách & Quyền Riêng Tư</a></b>.
         </div>
         <button class="modal-btn" onclick="closeModal('introModal')">Đã hiểu!</button>
@@ -73,13 +74,16 @@
         <span class="close-modal-top" onclick="closeModal('privacyModal')">&times;</span>
         <div class="modal-title" style="text-align: center;">Chính sách & Quyền Riêng Tư</div>
         <div class="modal-desc policy-content">
-            <p>Chào mừng bạn đến với <b>Nơi lưu giữ kỷ niệm</b>.</p>
+            <p>Chào mừng bạn đến với <b>Nơi lưu giữ kỷ niệm</b>. Trước khi tải lên hình ảnh hoặc video, vui lòng đọc kỹ các điều khoản sau:</p>
+            
             <h4>1. Quyền sử dụng hình ảnh</h4>
-            <p>Bạn đồng ý cho phép Ban quản trị sử dụng nội dung nhằm mục đích kỷ yếu, video kỷ niệm chung.</p>
-            <h4>2. Miễn trừ trách nhiệm</h4>
-            <p>Chúng tôi có quyền sử dụng các hình ảnh bạn đã upload mà không cần phải xin phép lại.</p>
-            <h4>3. Bảo mật thông tin</h4>
-            <p>Email và Tên lớp chỉ dùng để định danh thư mục. API Key đã được ẩn bằng Cloudflare Worker.</p>
+            <p>Bằng việc thực hiện thao tác tải ảnh/video lên hệ thống này, bạn đồng ý vô điều kiện cho phép Ban quản trị/Người tạo website được quyền sử dụng, sao chép, chỉnh sửa, và phân phối các nội dung này nhằm mục đích: <b>truyền tải thông điệp, làm kỷ yếu, video kỷ niệm chung, hoặc các hoạt động phi thương mại khác</b> liên quan đến tập thể.</p>
+            
+            <h4>2. Miễn trừ trách nhiệm xin phép</h4>
+            <p>Chúng tôi có quyền sử dụng các hình ảnh bạn đã upload mà <b>không cần phải xin phép lại</b> hoặc thông báo trước cho bạn trong từng trường hợp cụ thể. Bạn xác nhận rằng bạn có đầy đủ quyền đối với các hình ảnh bạn tải lên và việc chúng tôi sử dụng chúng không vi phạm quyền của bên thứ ba.</p>
+
+            <h4>3. Bảo mật thông tin liên lạc</h4>
+            <p>Email và Tên lớp của bạn chỉ được sử dụng duy nhất cho mục đích định danh thư mục và gửi lại ảnh cho bạn trong tương lai. Chúng tôi cam kết không chia sẻ email này cho bên thứ ba.</p>
         </div>
         <div style="text-align: center;">
             <button class="modal-btn" onclick="closeModal('privacyModal')">Tôi đồng ý</button>
@@ -126,33 +130,81 @@
 </div>
 
 <footer>
-    <div>&copy;Archive System 2026 v4</div>
+    <div>&copy;Archive System 2026 v5</div>
     <div style="margin-top: 8px;">
         Liên hệ Admin: <a href="mailto:admin@email.com">Gửi Mail</a> | 
         <a onclick="openModal('privacyModal')">Chính sách Quyền riêng tư</a>
     </div>
 </footer>
-
 <script>
-// --- CẤU HÌNH WORKER ---
-    const WORKER_URL = 'https://upload-proxy.phucphamxuan1234.workers.dev'; 
+    // ============================================================
+    // 1. CẤU HÌNH DROPBOX (ĐIỀN KEY CỦA BẠN VÀO ĐÂY)
+    // ============================================================
+    const DB_APP_KEY = 'gmrkyo6hyxilwcx'; 
+    const DB_APP_SECRET = 'sgs2qwv8ajkmoej';
+    const DB_REFRESH_TOKEN = '_6kRRl2INtYAAAAAAAAAAe3vMn04ROpuXPbugAFCwnJgEX9lFgGKoG4nwBG563Sa';
+
+    // ============================================================
+    // 2. LOGIC XỬ LÝ TOKEN & API (Chuyển từ Worker về đây)
+    // ============================================================
     
-    // TỰ ĐỘNG PHÁT HIỆN MOBILE
+    let cachedToken = null;
+    let tokenExpiresAt = 0;
+
+    async function getValidToken() {
+        if (!cachedToken || Date.now() >= tokenExpiresAt) {
+            console.log("Token expired or missing, refreshing...");
+            return await refreshAccessToken();
+        }
+        return cachedToken;
+    }
+
+    async function refreshAccessToken() {
+        try {
+            const body = new URLSearchParams({
+                grant_type: "refresh_token",
+                refresh_token: DB_REFRESH_TOKEN,
+                client_id: DB_APP_KEY,
+                client_secret: DB_APP_SECRET,
+            });
+
+            const r = await fetch("https://api.dropbox.com/oauth2/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: body
+            });
+
+            if (!r.ok) {
+                const txt = await r.text();
+                throw new Error("Lỗi lấy Token: " + txt);
+            }
+
+            const data = await r.json();
+            cachedToken = data.access_token;
+            // Trừ hao 2 phút
+            tokenExpiresAt = Date.now() + (data.expires_in * 1000) - 120000;
+            return cachedToken;
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+    }
+
+    // ============================================================
+    // 3. LOGIC APP CHÍNH
+    // ============================================================
+    
+    // Tự động phát hiện Mobile
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    
-    // Nếu là Mobile: Chỉ upload 1 file/lần (để dồn toàn bộ băng thông cho file đó, tránh timeout)
-    // Nếu là PC: Upload 3 file/lần
     const PARALLEL_UPLOADS = isMobile ? 1 : 3;
 
-    // --- 1. Xử lý Popup & Giao diện ---
     window.onload = function() {
         setTimeout(() => { document.getElementById('introModal').classList.add('active'); }, 500);
         loadUserData();
     }
-    function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    // --- 2. Xử lý lưu/tải thông tin người dùng ---
+    // --- Load User Data ---
     function loadUserData() {
         const savedClass = localStorage.getItem('user_class');
         const savedEmail = localStorage.getItem('user_email');
@@ -167,6 +219,7 @@
             document.getElementById('memory-stats').style.display = 'none';
         }
     }
+
     function enableEdit() {
         if (confirm("Xóa thông tin cũ để nhập lại?")) {
             localStorage.removeItem('user_class');
@@ -175,7 +228,15 @@
         }
     }
 
-    // --- TÍNH NĂNG: Check số lượng file ---
+    // --- Helper: Clean Filename ---
+    function sanitizeFilename(str) {
+        return str.normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                  .replace(/[^a-zA-Z0-9._-]/g, '_');
+    }
+
+    // --- API: Check Memory Stats (Profile) ---
     async function checkExistingMemories(classId, email) {
         const statsDiv = document.getElementById('memory-stats');
         statsDiv.style.display = 'block';
@@ -185,63 +246,175 @@
         const fullPath = `/Confession/${safeClassId}/${safeEmail}/profile.json`;
 
         try {
-            const response = await fetch(WORKER_URL + '/memory-stats', {
-                method: 'POST',
+            const token = await getValidToken();
+            
+            // Download JSON từ Dropbox
+            const r = await fetch("https://content.dropboxapi.com/2/files/download", {
+                method: "POST",
                 headers: {
-                    'Dropbox-API-Arg': JSON.stringify({ path: fullPath })
+                    "Authorization": `Bearer ${token}`,
+                    "Dropbox-API-Arg": JSON.stringify({ path: fullPath })
                 }
             });
 
-            const data = await response.json();
-
-            if (!data.exists) {
+            if (r.status === 409 || r.status === 404) {
                 statsDiv.innerHTML = 'Chào bạn mới! Bạn chưa có kỷ niệm nào.';
-            } else {
-                statsDiv.innerHTML =
-                    `Bạn đang lưu giữ <strong>${data.totalFiles}</strong> kỷ niệm tại đây.`;
+                return;
             }
 
-            statsDiv.style.display = 'block';
+            if (!r.ok) throw new Error("Dropbox API Error");
 
-        } catch {
-            statsDiv.innerHTML = '⚠️ Không thể kiểm tra kho lưu trữ lúc này.';
-            statsDiv.style.display = 'block';
+            const profile = await r.json();
+            let totalFiles = 0;
+            if (Array.isArray(profile.history)) {
+                for (const s of profile.history) {
+                    if (Array.isArray(s.files)) {
+                        totalFiles += s.files.length;
+                    }
+                }
+            }
+            statsDiv.innerHTML = `Bạn đang lưu giữ <strong>${totalFiles}</strong> kỷ niệm tại đây.`;
+
+        } catch (e) {
+            console.error(e);
+            statsDiv.innerHTML = '⚠️ Không thể kiểm tra (Có thể do CORS chặn).';
         }
-
     }
 
-    // --- Helper: Xóa dấu Tiếng Việt ---
-    function sanitizeFilename(str) {
-        return str.normalize('NFD')
-                  .replace(/[\u0300-\u036f]/g, '')
-                  .replace(/đ/g, 'd').replace(/Đ/g, 'D')
-                  .replace(/[^a-zA-Z0-9._-]/g, '_');
-    }
-
-    // --- 3. Xử lý File Input ---
-    const fileInput = document.getElementById('fileInput');
-    const fileCountSpan = document.getElementById('fileCount');
-    fileInput.addEventListener('change', function() {
-        fileCountSpan.textContent = this.files.length > 0 ? `Đã chọn ${this.files.length} file` : '';
-    });
-
-    // --- 4. KHỞI TẠO FOLDER (FIX LỖI LẦN ĐẦU) ---
+    // --- API: Create Folder ---
     async function ensureFolderExists(folderPath) {
         try {
-            // Thử tạo folder (nếu đã tồn tại sẽ trả về lỗi nhưng không sao)
-            await fetch(WORKER_URL + '/create_folder', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path: folderPath })
+            const token = await getValidToken();
+            const r = await fetch("https://api.dropboxapi.com/2/files/create_folder_v2", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ path: folderPath, autorename: false })
             });
+
+            if (!r.ok && r.status !== 409) { // 409 means folder exists
+                const txt = await r.text();
+                console.warn("Create folder warning:", txt);
+            }
             return true;
         } catch (e) {
-            // Bỏ qua lỗi nếu folder đã tồn tại
+            console.error("Create folder error:", e);
+            // Vẫn return true để code chạy tiếp, vì có thể folder đã có
             return true;
         }
     }
 
-    // --- 5. UPLOAD SONG SONG (TỐI ƯU TỐC ĐỘ) ---
+    // --- API: Upload File ---
+    async function uploadToDropboxWithRetry(file, folderPath, maxRetries = 5) {
+        let delay = 1000;
+        const token = await getValidToken();
+        
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const fullPath = `${folderPath}/${file.name}`;
+                const args = { 
+                    "path": fullPath, 
+                    "mode": "add", 
+                    "autorename": true, 
+                    "mute": false 
+                };
+                
+                // Upload trực tiếp lên content.dropboxapi.com
+                const response = await fetch("https://content.dropboxapi.com/2/files/upload", {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/octet-stream', 
+                        'Dropbox-API-Arg': JSON.stringify(args) 
+                    },
+                    body: file // Trình duyệt tự xử lý File object thành binary
+                });
+                
+                if (response.ok) return true;
+                
+                if (response.status >= 500) {
+                    throw new Error("Server Error 5xx");
+                } else {
+                    console.error(`Upload failed: ${response.status} ${await response.text()}`);
+                    return false;
+                }
+            } catch (error) { 
+                console.warn(`Retry ${i+1}/${maxRetries} for ${file.name}`, error);
+                if (i < maxRetries - 1) {
+                    await new Promise(r => setTimeout(r, delay));
+                    delay *= 2;
+                }
+            }
+        }
+        return false;
+    }
+
+    // --- API: Update JSON Profile ---
+    async function updateProfileJsonWithRetry(folderPath, email, classId, sessionData) {
+        let retries = 3; 
+        while (retries > 0) {
+            try {
+                const token = await getValidToken();
+                const jsonFileName = "profile.json";
+                const fullPath = `${folderPath}/${jsonFileName}`;
+                
+                let profile = { 
+                    user_email: email, 
+                    user_class: classId, 
+                    created_at: new Date().toISOString(), 
+                    last_updated: new Date().toISOString(), 
+                    history: [] 
+                };
+
+                // 1. Thử tải JSON cũ về
+                try {
+                    const downloadResp = await fetch("https://content.dropboxapi.com/2/files/download", {
+                        method: 'POST',
+                        headers: { 
+                            'Authorization': `Bearer ${token}`,
+                            'Dropbox-API-Arg': JSON.stringify({ "path": fullPath }) 
+                        }
+                    });
+                    if (downloadResp.ok) {
+                        profile = await downloadResp.json();
+                    }
+                } catch (e) {
+                    console.log("JSON chưa tồn tại, sẽ tạo mới.");
+                }
+
+                // 2. Cập nhật dữ liệu
+                profile.history.push(sessionData);
+                profile.last_updated = new Date().toISOString();
+
+                // 3. Upload đè lại (Overwrite)
+                const jsonBlob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
+                const args = { "path": fullPath, "mode": "overwrite", "autorename": false, "mute": true };
+
+                const uploadResp = await fetch("https://content.dropboxapi.com/2/files/upload", {
+                    method: 'POST',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/octet-stream', 
+                        'Dropbox-API-Arg': JSON.stringify(args) 
+                    },
+                    body: jsonBlob
+                });
+                
+                if (!uploadResp.ok) throw new Error("Lỗi upload JSON");
+                return; // Success
+
+            } catch (e) {
+                console.warn("Lỗi update JSON, thử lại...", e);
+                retries--;
+                await new Promise(r => setTimeout(r, 1000));
+            }
+        }
+        console.error("Không thể cập nhật JSON");
+    }
+
+    // --- Parallel Upload Logic ---
     async function uploadFilesInParallel(files, folderPath, onProgress) {
         const results = [];
         const queue = [...files];
@@ -252,30 +425,31 @@
                 const file = queue.shift();
                 if (!file) break;
                 
-                const result = await uploadToDropboxWithRetry(file, folderPath, 5);
+                const result = await uploadToDropboxWithRetry(file, folderPath, 3);
                 results.push({ file: file.name, success: result });
                 completed++;
                 
-                if (onProgress) {
-                    onProgress(completed, files.length);
-                }
+                if (onProgress) onProgress(completed, files.length);
             }
         }
         
-        // Chạy song song PARALLEL_UPLOADS worker
-        const workers = Array(Math.min(PARALLEL_UPLOADS, files.length))
-            .fill(null)
-            .map(() => uploadWorker());
-        
+        const workers = Array(Math.min(PARALLEL_UPLOADS, files.length)).fill(null).map(() => uploadWorker());
         await Promise.all(workers);
         return results;
     }
 
-    // --- 6. Logic Upload Chính (CẢI TIẾN: Upload song song + Khởi tạo folder) ---
+    // --- MAIN SUBMIT FUNCTION ---
+    const fileInput = document.getElementById('fileInput');
+    const fileCountSpan = document.getElementById('fileCount');
+    
+    fileInput.addEventListener('change', function() {
+        fileCountSpan.textContent = this.files.length > 0 ? `Đã chọn ${this.files.length} file` : '';
+    });
+
     async function submitConfession() {
-        if (WORKER_URL.includes("Dien-URL")) { 
-            alert("⚠️ Bạn chưa điền WORKER_URL trong code!"); 
-            return; 
+        if (!DB_APP_KEY || DB_APP_KEY.includes('ĐIỀN')) {
+            alert("⚠️ Bạn chưa điền API KEY trong code HTML!");
+            return;
         }
 
         const classId = document.getElementById('classId').value.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-');
@@ -309,187 +483,75 @@
         const folderPath = `/Confession/${safeClassId}/${email}`;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
-        // --- BƯỚC 0: ĐẢM BẢO FOLDER TỒN TẠI (FIX LỖI LẦN ĐẦU) ---
-        statusDiv.innerHTML = "📁 Đang khởi tạo thư mục...";
-        await ensureFolderExists(folderPath);
-
-        // --- BƯỚC 1: LỌC FILE HỢP LỆ ---
-        let fileQueue = [];
-        for (let i = 0; i < files.length; i++) {
-            if (files[i].size > 100 * 1024 * 1024) {
-                alert(`⚠️ File "${files[i].name}" lớn hơn 100MB nên sẽ bị bỏ qua.`);
-                continue;
-            }
-            const safeName = sanitizeFilename(files[i].name);
-            const finalName = `${timestamp}_${safeName}`;
-            fileQueue.push(new File([files[i]], finalName, {type: files[i].type}));
-        }
-
-        // --- BƯỚC 2: UPLOAD SONG SONG (QUAN TRỌNG) ---
-        let successfulFileNames = [];
-        let totalFiles = fileQueue.length;
-
-        if (totalFiles > 0) {
-            statusDiv.innerHTML = "🚀 Đang tải lên song song...";
-            
-            const results = await uploadFilesInParallel(fileQueue, folderPath, (completed, total) => {
-                const percent = Math.round((completed / total) * 100);
-                progressBar.style.width = percent + '%';
-                statusDiv.innerHTML = `📤 Đang tải: ${completed}/${total} files (${percent}%)`;
-            });
-            
-            // Lọc file thành công
-            successfulFileNames = results
-                .filter(r => r.success)
-                .map(r => r.file);
-        }
-
-        // --- BƯỚC 3: CẬP NHẬT JSON SAU CÙNG ---
-        if (successfulFileNames.length > 0 || textContent !== "") {
-            progressBar.style.width = '95%';
-            statusDiv.innerHTML = "📝 Đang ghi vào lưu bút...";
-            
-            const currentSession = { 
-                uploaded_at: new Date().toISOString(), 
-                note: textContent, 
-                files: successfulFileNames 
-            };
-            
-            await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
-            
-            progressBar.style.width = '100%';
-            statusDiv.innerHTML = `✅ <b>Hoàn tất!</b> Đã lưu thành công ${successfulFileNames.length}/${totalFiles} file.`;
-            
-            checkExistingMemories(classId, email);
-            resetForm();
-            
-            setTimeout(() => {
-                progressContainer.style.display = 'none';
-                progressBar.style.width = '0%';
-            }, 3000);
-        } else {
-             statusDiv.innerHTML = `❌ <b>Lỗi!</b> Không có file nào được tải lên thành công.`;
-             progressContainer.style.display = 'none';
-        }
-
-        btn.disabled = false;
-        btn.innerHTML = 'Gửi Lưu Bút';
-    }
-
-    function resetForm() {
-        document.getElementById('confessionText').value = "";
-        fileInput.value = "";
-        fileCountSpan.textContent = "";
-    }
-
-    // --- Helper: Update JSON với Exponential Backoff ---
-    async function updateProfileJsonWithRetry(folderPath, email, classId, sessionData) {
-        let retries = 5;
-        let delay = 1000;
-        
-        while (retries > 0) {
-            try { 
-                return await updateProfileJson(folderPath, email, classId, sessionData); 
-            } catch (e) { 
-                console.warn(`Lỗi JSON, thử lại... (${retries} lần còn lại)`, e); 
-                retries--; 
-                if (retries > 0) {
-                    await new Promise(r => setTimeout(r, delay));
-                    delay *= 2; // Exponential backoff
-                }
-            }
-        }
-        throw new Error("Không thể cập nhật JSON sau nhiều lần thử");
-    }
-
-    async function updateProfileJson(folderPath, email, classId, sessionData) {
-        const jsonFileName = "profile.json";
-        const fullPath = `${folderPath}/${jsonFileName}`;
-        let profile = { 
-            user_email: email, 
-            user_class: classId, 
-            created_at: new Date().toISOString(), 
-            last_updated: new Date().toISOString(), 
-            history: [] 
-        };
-
         try {
-            const downloadResp = await fetch(WORKER_URL + '/download', {
-                method: 'POST',
-                headers: { 'Dropbox-API-Arg': JSON.stringify({ "path": fullPath }) }
-            });
-            if (downloadResp.ok) {
-                const text = await downloadResp.text();
-                profile = JSON.parse(text);
+            // 1. Init Folder
+            statusDiv.innerHTML = "📁 Đang khởi tạo thư mục...";
+            await ensureFolderExists(folderPath);
+
+            // 2. Prepare Files
+            let fileQueue = [];
+            for (let i = 0; i < files.length; i++) {
+                if (files[i].size > 100 * 1024 * 1024) {
+                    alert(`⚠️ File "${files[i].name}" lớn hơn 100MB bỏ qua.`);
+                    continue;
+                }
+                const safeName = sanitizeFilename(files[i].name);
+                const finalName = `${timestamp}_${safeName}`;
+                // Tạo file mới với tên đã clean
+                fileQueue.push(new File([files[i]], finalName, {type: files[i].type}));
             }
-        } catch (e) {
-            console.log("JSON chưa tồn tại, tạo mới");
-        }
 
-        profile.history.push(sessionData);
-        profile.last_updated = new Date().toISOString();
+            // 3. Upload
+            let successfulFileNames = [];
+            if (fileQueue.length > 0) {
+                statusDiv.innerHTML = "🚀 Đang tải lên song song...";
+                const results = await uploadFilesInParallel(fileQueue, folderPath, (completed, total) => {
+                    const percent = Math.round((completed / total) * 100);
+                    progressBar.style.width = percent + '%';
+                    statusDiv.innerHTML = `📤 Đang tải: ${completed}/${total} files (${percent}%)`;
+                });
+                successfulFileNames = results.filter(r => r.success).map(r => r.file);
+            }
 
-        const jsonFile = new File([JSON.stringify(profile, null, 2)], jsonFileName, { type: 'application/json' });
-        const args = { "path": fullPath, "mode": "overwrite", "autorename": false, "mute": true };
-
-        const uploadResp = await fetch(WORKER_URL + '/upload', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/octet-stream', 
-                'Dropbox-API-Arg': JSON.stringify(args) 
-            },
-            body: jsonFile
-        });
-        
-        if (!uploadResp.ok) {
-            throw new Error(`Upload JSON failed: ${uploadResp.status}`);
-        }
-    }
-
-    // --- Helper: Upload File với Exponential Backoff ---
-    async function uploadToDropboxWithRetry(file, folderPath, maxRetries = 5) {
-        let delay = 1000;
-        
-        for (let i = 0; i < maxRetries; i++) {
-            try {
-                const fullPath = `${folderPath}/${file.name}`;
-                const args = { 
-                    "path": fullPath, 
-                    "mode": "add", 
-                    "autorename": true, 
-                    "mute": false 
+            // 4. Update Log
+            if (successfulFileNames.length > 0 || textContent !== "") {
+                progressBar.style.width = '95%';
+                statusDiv.innerHTML = "📝 Đang ghi vào lưu bút...";
+                
+                const currentSession = { 
+                    uploaded_at: new Date().toISOString(), 
+                    note: textContent, 
+                    files: successfulFileNames 
                 };
                 
-                const response = await fetch(WORKER_URL + '/upload', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/octet-stream', 
-                        'Dropbox-API-Arg': JSON.stringify(args) 
-                    },
-                    body: file
-                });
+                await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
                 
-                if (response.ok) return true;
+                progressBar.style.width = '100%';
+                statusDiv.innerHTML = `✅ <b>Hoàn tất!</b> Đã lưu ${successfulFileNames.length} file.`;
                 
-                // Nếu lỗi 5xx thì retry
-                if (response.status >= 500) {
-                    throw new Error("Server Error");
-                } else {
-                    // Lỗi khác thì dừng ngay
-                    console.error(`Upload failed for ${file.name}: ${response.status}`);
-                    return false;
-                }
-            } catch (error) { 
-                console.warn(`Retry ${i+1}/${maxRetries} for ${file.name}`);
-                if (i < maxRetries - 1) {
-                    await new Promise(r => setTimeout(r, delay));
-                    delay *= 2; // Exponential backoff
-                }
+                checkExistingMemories(classId, email);
+                // Reset
+                document.getElementById('confessionText').value = "";
+                fileInput.value = "";
+                fileCountSpan.textContent = "";
+                
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                }, 3000);
+            } else {
+                statusDiv.innerHTML = `❌ Lỗi hoặc không có gì để lưu.`;
             }
+
+        } catch (e) {
+            console.error(e);
+            statusDiv.innerHTML = `❌ Lỗi nghiêm trọng: ${e.message}`;
+            alert("Có lỗi xảy ra, vui lòng kiểm tra Console (F12) để xem chi tiết lỗi CORS hoặc Mạng.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi Lưu Bút';
         }
-        return false;
     }
 </script>
 </body>
 </html>
-
