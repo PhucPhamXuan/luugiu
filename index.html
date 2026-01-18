@@ -128,7 +128,7 @@
 <footer>
     <div>&copy;Archive System 2026 v3.5 (Optimized)</div>
     <div style="margin-top: 8px;">
-        Liên hệ Admin: <a href="mailtophucphamxuan1234@gmail.com">Gửi Mail</a> | 
+        Liên hệ Admin: <a href="mailto:admin@email.com">Gửi Mail</a> | 
         <a onclick="openModal('privacyModal')">Chính sách Quyền riêng tư</a>
     </div>
 </footer>
@@ -179,29 +179,29 @@
         const fullPath = `/Confession/${safeClassId}/${safeEmail}/profile.json`;
 
         try {
-            const response = await fetch(WORKER_URL + '/download', {
+            const response = await fetch(WORKER_URL + '/memory-stats', {
                 method: 'POST',
-                headers: { 'Dropbox-API-Arg': JSON.stringify({ "path": fullPath }) }
+                headers: {
+                    'Dropbox-API-Arg': JSON.stringify({ path: fullPath })
+                }
             });
 
-            if (response.ok) {
-                const text = await response.text();
-                const profile = JSON.parse(text);
-                let totalFiles = 0;
-                if (profile.history && Array.isArray(profile.history)) {
-                    profile.history.forEach(session => {
-                        if (session.files && Array.isArray(session.files)) {
-                            totalFiles += session.files.length;
-                        }
-                    });
-                }
-                statsDiv.innerHTML = `Bạn đang lưu giữ <strong>${totalFiles}</strong> kỷ niệm tại đây.`;
+            const data = await response.json();
+
+            if (!data.exists) {
+                statsDiv.innerHTML = 'Chào bạn mới! Bạn chưa có kỷ niệm nào.';
             } else {
-                statsDiv.innerHTML = `Chào bạn mới! Bạn chưa có kỷ niệm nào.`;
+                statsDiv.innerHTML =
+                    `Bạn đang lưu giữ <strong>${data.totalFiles}</strong> kỷ niệm tại đây.`;
             }
-        } catch (e) {
-            statsDiv.style.display = 'none';
+
+            statsDiv.style.display = 'block';
+
+        } catch {
+            statsDiv.innerHTML = '⚠️ Không thể kiểm tra kho lưu trữ lúc này.';
+            statsDiv.style.display = 'block';
         }
+
     }
 
     // --- Helper: Xóa dấu Tiếng Việt ---
