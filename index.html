@@ -29,6 +29,14 @@
         .submit-btn:hover { background-color: #166fe5; }
         .submit-btn:disabled { background-color: #b0c4de; cursor: not-allowed; }
         #status { margin-top: 16px; padding: 12px; background-color: #e7f3ff; border-radius: 8px; font-size: 0.9rem; white-space: pre-line; display: none; color: #0c5460; }
+        
+        /* CSS Mới cho phần thống kê */
+        #memory-stats {
+            text-align: center; font-size: 0.9rem; color: #65676b; margin-bottom: 15px;
+            background: #f0f2f5; padding: 8px; border-radius: 6px; display: none;
+        }
+        #memory-stats strong { color: #1877f2; }
+
         footer { width: 100%; text-align: center; padding: 20px; font-size: 0.85rem; color: #65676b; background: #fff; border-top: 1px solid #e4e6eb; margin-top: 20px; }
         footer a { color: #1877f2; text-decoration: none; font-weight: 600; cursor: pointer; }
         footer a:hover { text-decoration: underline; }
@@ -122,7 +130,6 @@
 
 <script>
     // --- CẤU HÌNH WORKER ---
-    // Kiểm tra kỹ URL này phải KHỚP với URL Cloudflare Worker bạn đã tạo
     const WORKER_URL = 'https://upload-proxy.phucphamxuan1234.workers.dev'; 
 
     // --- 1. Xử lý Popup & Giao diện ---
@@ -143,6 +150,11 @@
             document.getElementById('classId').disabled = true;
             document.getElementById('userEmail').disabled = true;
             document.getElementById('changeClassBtn').style.display = 'inline';
+            
+            // Kích hoạt tính năng đếm file ngay khi load
+            checkExistingMemories(savedClass, savedEmail);
+        } else {
+            document.getElementById('memory-stats').style.display = 'none';
         }
     }
     function enableEdit() {
@@ -153,7 +165,46 @@
         }
     }
 
-    // --- Helper: Xóa dấu Tiếng Việt (Quan trọng cho mobile) ---
+    // --- TÍNH NĂNG MỚI: Check số lượng file ---
+    async function checkExistingMemories(classId, email) {
+        const statsDiv = document.getElementById('memory-stats');
+        statsDiv.style.display = 'block';
+        
+        const safeClassId = classId.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-').replace(/\//g, '-');
+        const safeEmail = email.trim().toLowerCase();
+        const fullPath = `/Confession/${safeClassId}/${safeEmail}/profile.json`;
+
+        try {
+            const response = await fetch(WORKER_URL + '/download', {
+                method: 'POST',
+                headers: { 'Dropbox-API-Arg': JSON.stringify({ "path": fullPath }) }
+            });
+
+            if (response.ok) {
+                const text = await response.text();
+                const profile = JSON.parse(text);
+                
+                // Đếm tổng số file trong lịch sử
+                let totalFiles = 0;
+                if (profile.history && Array.isArray(profile.history)) {
+                    profile.history.forEach(session => {
+                        if (session.files && Array.isArray(session.files)) {
+                            totalFiles += session.files.length;
+                        }
+                    });
+                }
+                
+                statsDiv.innerHTML = `Bạn đang lưu giữ <strong>${totalFiles}</strong> kỷ niệm tại đây.`;
+            } else {
+                // Nếu chưa có file profile (người dùng mới)
+                statsDiv.innerHTML = `Chào bạn mới! Bạn chưa có kỷ niệm nào.`;
+            }
+        } catch (e) {
+            statsDiv.style.display = 'none'; // Ẩn nếu lỗi mạng
+        }
+    }
+
+    // --- Helper: Xóa dấu Tiếng Việt ---
     function sanitizeFilename(str) {
         return str.normalize('NFD')
                   .replace(/[\u0300-\u036f]/g, '')
@@ -168,7 +219,7 @@
         fileCountSpan.textContent = this.files.length > 0 ? `Đã chọn ${this.files.length} file` : '';
     });
 
-    // --- 4. Logic Upload Chính (Qua Cloudflare Worker) ---
+    // --- 4. Logic Upload Chính (Có cập nhật lại số đếm sau khi up xong) ---
     async function submitConfession() {
         if (WORKER_URL.includes("Dien-URL")) { alert("⚠️ Bạn chưa điền WORKER_URL trong code!"); return; }
 
@@ -193,12 +244,11 @@
         const folderPath = `/Confession/${safeClassId}/${email}`;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
-        // --- BƯỚC 1: LỌC FILE & ĐỔI TÊN ---
+        // --- BƯỚC 1: LỌC FILE ---
         let fileQueue = [];
         for (let i = 0; i < files.length; i++) {
-            // Check 100MB cho Cloudflare Free
             if (files[i].size > 100 * 1024 * 1024) {
-                alert(`⚠️ File "${files[i].name}" lớn hơn 100MB (giới hạn Cloudflare) nên sẽ bị bỏ qua.`);
+                alert(`⚠️ File "${files[i].name}" lớn hơn 100MB nên sẽ bị bỏ qua.`);
                 continue;
             }
             const safeName = sanitizeFilename(files[i].name);
@@ -206,17 +256,15 @@
             fileQueue.push(new File([files[i]], finalName, {type: files[i].type}));
         }
 
-        // --- BƯỚC 2: CẬP NHẬT JSON (TẠO FOLDER) ---
+        // --- BƯỚC 2: CẬP NHẬT JSON ---
         statusDiv.innerHTML = "🔄 Đang khởi tạo hồ sơ...";
         const currentSession = { uploaded_at: new Date().toISOString(), note: textContent, files: fileQueue.map(f => f.name) };
         
-        // Upload file JSON trước để Dropbox tạo thư mục
         await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
 
-        // --- [FIX LỖI] Đợi 2 giây để Dropbox kịp nhận diện folder mới ---
         if (fileQueue.length > 0) {
             statusDiv.innerHTML = "⏳ Đang đồng bộ thư mục mới...";
-            await new Promise(resolve => setTimeout(resolve, 2000)); 
+            await new Promise(resolve => setTimeout(resolve, 5000)); // Chờ 5 giây để Dropbox đồng bộ thư mục
         }
 
         // --- BƯỚC 3: UPLOAD MEDIA ---
@@ -226,14 +274,9 @@
         for (let i = 0; i < totalFiles; i++) {
             const file = fileQueue[i];
             statusDiv.innerHTML = `Đang tải: ${file.name} (${i+1}/${totalFiles})...`;
-            
-            // Retry 5 lần nếu lỗi
             const result = await uploadToDropboxWithRetry(file, folderPath, 5);
-            
             if (result) successCount++;
-            
-            // --- [FIX LỖI] Nghỉ 0.5s giữa các file để tránh nghẽn mạng ---
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 1000)); // Nghỉ 2 giây giữa các lần upload
         }
 
         // --- KẾT THÚC ---
@@ -243,14 +286,18 @@
             ? `✅ <b>Thành công!</b> Đã lưu ${successCount}/${totalFiles} file.`
             : `⚠️ <b>Hoàn tất một phần.</b> Đã lưu ${successCount}/${totalFiles} file.`;
         
-        if (successCount > 0 || (totalFiles === 0 && textContent !== "")) resetForm();
+        if (successCount > 0 || (totalFiles === 0 && textContent !== "")) {
+            // Cập nhật lại số đếm file ngay lập tức
+            checkExistingMemories(classId, email);
+            resetForm();
+        }
     }
 
     function resetForm() {
         document.getElementById('confessionText').value = "";
         fileInput.value = "";
         fileCountSpan.textContent = "";
-        loadUserData();
+        // Không gọi lại loadUserData để tránh reset khung thông báo
     }
 
     // --- Helper: Update JSON ---
@@ -286,10 +333,7 @@
 
         await fetch(WORKER_URL + '/upload', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/octet-stream',
-                'Dropbox-API-Arg': JSON.stringify(args)
-            },
+            headers: { 'Content-Type': 'application/octet-stream', 'Dropbox-API-Arg': JSON.stringify(args) },
             body: jsonFile
         });
     }
@@ -300,22 +344,14 @@
             try {
                 const fullPath = `${folderPath}/${file.name}`;
                 const args = { "path": fullPath, "mode": "add", "autorename": true, "mute": false };
-                
                 const response = await fetch(WORKER_URL + '/upload', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/octet-stream',
-                        'Dropbox-API-Arg': JSON.stringify(args)
-                    },
+                    headers: { 'Content-Type': 'application/octet-stream', 'Dropbox-API-Arg': JSON.stringify(args) },
                     body: file
                 });
-
                 if (response.ok) return true;
                 if (response.status >= 500) throw new Error("Server Error");
-            } catch (error) {
-                console.warn(`Lỗi upload lần ${i+1}, thử lại...`, error);
-                await new Promise(r => setTimeout(r, 1500));
-            }
+            } catch (error) { await new Promise(r => setTimeout(r, 1500)); }
         }
         return false;
     }
