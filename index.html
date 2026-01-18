@@ -204,7 +204,7 @@
 </div>
 
 <footer>
-    <div>Archive System &copy; 2026</div>
+    <div>Archive System &copy; 2026 - v1.1</div>
     <div style="margin-top: 8px;">
         Liên hệ Admin: <a href="mailto:phucphamxuan1234@gmail.com">Gửi Mail</a> | 
         <a onclick="openModal('privacyModal')">Chính sách Quyền riêng tư</a>
@@ -212,59 +212,55 @@
 </footer>
 
 <script>
-    // --- TOKEN CỦA BẠN (Đã tích hợp sẵn) ---
-    const ACCESS_TOKEN = 'sl.u.AGMRmcLTGUi-BNjPehF6mzGlNUCuzzrLQ032M6fjxVYgGVNTRkDk1JvIVomj9PuhXuac1OHxrTZI0rB9nmzzBmMOC_kskhjQ72JIzhGTfA1kcT1UK-rV_zUzC2m995p-_4dZfXyTaJ1B6e1wmTb4eGINBqDeq1dfwmBuFVn-Jid5esTvHyyTcs1I3JCF0AsVL-kR_Xlxqz48kmjKFIcAm9pLC1ZqQrNbfDg_sMRZuPHb6w95F2eaGmQzUANz6nBd-fCjXRWe82Xo7hPxzuDQRGZ1ddnLLw7nN7bxyD8puJjaexQyE0cZI7ywtay29zdHYhwB80t7mRrvMiT39x31T86Rxax6A6D5FYc59fOBwagcXBx0B-J2lzkv868k5nmP68X0BCWwKQT84ZlDhJGaT6WcxN73gcdwv1sSDAJP4vZWFDPwdMqy9deRKBpIajicggP6qhEBTmoBxzNRL9VJMhH7Q3Q6fpX78IoqCUi4yA1KZbvfOPV09bigbkSwzyppmofcSBJJShHRS2_Nt81KsaVjwLKhtta1gAyCjLc9CsNYGtf2g_3YYJ-zgvD3glrkNsw77Q5qUrHD8Q6hXQPzyPmsCKmrsq8ny85bTEol1_paHcAG8FauyKv9W6vMTnIkfPvekSxRXh4eA8_TzoWY4CN2ijBSRPj-WAAyeP6MDm1CvkveDPh2_CkfNJlfIMBZXp3XMbeJkxGRq1TljwdgRQFycLMhvCGykt8ie3v13nd5b8mSqCgjEuwWoc9zucyom1TB52dY1RYjP38YkMcutTl3T50dpWQHJirG8f2grh7BTHxQarVba_rVEnGmgXY2ZOHHHIXPgONLPbZVu01FHA-NE40y3G81Dl1ob_jVQjJkcTkS65fG-iTh5QemPWKtIocWF-kyqmxpLPcx90zlUYpvRbvVSZBTsZjWcH7fkEXsyKqAlWv36jqxBfW44l6rxdxpIo0Y_tADNx5QNOYgDcr2hPkBN5ScGmF6L4FzK0fAiALotcBJsTPGsJ5u_AqyJvvtdXpXUsmNVgAXZVyT-0_k10YHpaK6L489LyBZ5CQDcysb7d-U4bBuBMIwuw0HsN7Xa-llLpyW5V8vSCXd4nSTkl9jl0TUxEn9-Pe_R2el6c2SZQzeNjXu3PzcoEIf7BdUcNQJhoN1FX50a9-joqZQaDOrCC7CNKNu_CufbVQgn04EztoZabn2zxpuLG8CoQUp_LTv_ejXrLp6rg82iwb6crdhzlcRbIZv5lMABLiYfNxHlSYHrotKQV52SVHsbU0S-2r29Mq5Y_JyxY0G77jLfEZs2iK7AUGDrDPEiY5bo2VmvB9zqDufMI1OdD6BUalGxCBGHskrqDf3yQao3x7A'; 
+    // --- TOKEN CỦA BẠN ---
+    const ACCESS_TOKEN = 'sl.u.AGM5AUHGI6GTISZK_I-XYCwKnQoZxjVLSI4ZDqdbi94C5W7UdPC8VLns_vhA1j25AEhQpITsnOvoUCRnedv2DzHA-v7BB8jpEYY7rSLAhF6-d298Umh_vA3W7pvH40d1bNpyeN7keTLY5dewN706w7ECPc4h9siXUVfcMIh-nQFJ38oddAHG1iJEeLUFIxDXuYIW8r29zAIrOK63CRzbB4-KmwmHRnqrpOrgN_xxvQ7gQLeGjE-Y626QyWDJJggnk_o-e-Mu5ImcvooR61ZRZYLFxeSScgSXPNzjLn8QbX1z8rc5_NdXY25R7H6bgm-g9bnW_CPkXOEbB9LKScvXxxLFwPdacGvAxIoRB2TFbCLgdt-GutfuDegkEvKbFMLK5H33_BOzgYYyDGrNXa0jqD59GtvBJA-ZxkaxHzO0DKtrPYSqIZsxxKIiO_eCD8Eo0mL0emUfbB-nhCxLeViqV5-6hwQrcxIL0poFOIm3KMSYbPV7Rs44MXUY_w_2bVKbj20xvfCpz0mQj180jqTx7O5yfsTVVq7p-y-zwJ2Smemp2XLWAtAVuLRBrFJF8YakMPT165NJgeV3ViUhqdHBa1xEjVAQ40wxXGd7qR4URn1rv-ZrA-SUZKnsPoTigoUtZSrZmi9t-WJ4EAjG3vENF50UPSim6lkskIKQMGqqdKJ7MdAGUDhTWm37GSvgp6cT2EjZOG1hFmeQ3fGEbnPNl-BsM35ckCvHYTkKXAwiwtKNihuu8tfmSQ7XpGoQNcBxw-6bf4SBmKPiX3-P2l3lQUVCc4IKb3pmbOIK3nsSLRHRZRNJDpuiZkcDdbeaMowLOowxMkr0hYUIvQJmCowtNRk6c1bkfuh_diHvLOKzAamrkW-03PDeS8WzvG_0MxQNGHjGiqZZeDvbPkNjG7KZDCxRdtM8ZphwHeA5EhL7RkS2-8FisLMDD7AJ9Gmhx9c_NR7iaRZY8wJvdz-O5iEf0PjP22AFbdZRXsklHdbWWhuteIJkcWINfkUatHJyzAMixztxdGdDIzSieds3OUBd0rxq9CIpiAOt_GJkGgHAmw2OiOmsgroCluS4KGoZuM5UKsSBro7ipji6NNhOKuCwNe3-fIoG-1ngA211sAk9J3EULCtdA7lOkL30F5ivPddrDYIsUTKGF4ahtMqqA3yWIwKp_pL5z8MQM17d2Z_1huUjZNob5zc7iI_8RBwNw5Va-62vZpgjI-rMpbvjPz93lZKKPANHyTc3-Ha7qKBl_jn4drtm8SGRbH-0BSidUHEODczaKUvDJrhKb7ALaUmUpah2Bl4utUHLLG5VwlB3lShjWLPar4pa3jDEpSuCBmu6t9402XEcqKjQqjQe5vGLicAk';
 
     // --- 1. Xử lý Popup & Giao diện ---
     window.onload = function() {
-        // Hiện popup intro
         setTimeout(() => { document.getElementById('introModal').classList.add('active'); }, 500);
-        // Tải thông tin cũ nếu có
         loadUserData();
     }
 
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-    // --- 2. Xử lý lưu/tải thông tin người dùng (LocalStorage) ---
+    // --- 2. Xử lý lưu/tải thông tin người dùng ---
     function loadUserData() {
         const savedClass = localStorage.getItem('user_class');
         const savedEmail = localStorage.getItem('user_email');
-        
         if (savedClass && savedEmail) {
             const classInput = document.getElementById('classId');
             const emailInput = document.getElementById('userEmail');
-            
-            // Điền tự động
             classInput.value = savedClass;
             emailInput.value = savedEmail;
-            
-            // Khóa ô nhập
             classInput.disabled = true;
             emailInput.disabled = true;
-            
-            // Hiện nút đổi thông tin
             document.getElementById('changeClassBtn').style.display = 'inline';
         }
     }
 
     function enableEdit() {
-        const classInput = document.getElementById('classId');
-        const emailInput = document.getElementById('userEmail');
-        
         if (confirm("Bạn có muốn xóa thông tin đã lưu để nhập thông tin mới không?")) {
+            const classInput = document.getElementById('classId');
+            const emailInput = document.getElementById('userEmail');
             classInput.disabled = false;
             emailInput.disabled = false;
             classInput.value = "";
             emailInput.value = "";
-            
-            // Xóa khỏi bộ nhớ
             localStorage.removeItem('user_class');
             localStorage.removeItem('user_email');
-            
             document.getElementById('changeClassBtn').style.display = 'none';
             classInput.focus();
         }
+    }
+
+    // --- Helper: Xóa dấu Tiếng Việt và ký tự lạ ---
+    // Hàm này cực kỳ quan trọng để fix lỗi trên mobile
+    function sanitizeFilename(str) {
+        return str.normalize('NFD')
+                  .replace(/[\u0300-\u036f]/g, '')
+                  .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+                  .replace(/[^a-zA-Z0-9._-]/g, '_'); // Chỉ giữ lại chữ không dấu, số, và dấu chấm/gạch
     }
 
     // --- 3. Xử lý File Input ---
@@ -275,10 +271,9 @@
         else fileCountSpan.textContent = '';
     });
 
-    // --- 4. Logic Upload Chính (Giữ nguyên logic JSON thông minh) ---
+    // --- 4. Logic Upload Chính ---
     async function submitConfession() {
-        // Lấy value dù input đang bị disabled
-        const classId = document.getElementById('classId').value.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-'); // Cho phép dấu gạch chéo cho tên lớp 6/1
+        const classId = document.getElementById('classId').value.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-');
         const email = document.getElementById('userEmail').value.trim().toLowerCase();
         const textContent = document.getElementById('confessionText').value.trim();
         const files = fileInput.files;
@@ -288,57 +283,105 @@
         if (!classId || !email) { alert("⚠️ Vui lòng nhập Tên Lớp và Email!"); return; }
         if (files.length === 0 && textContent === "") { alert("⚠️ Hãy chọn ảnh hoặc viết lời nhắn!"); return; }
 
-        // Lưu thông tin vào LocalStorage ngay khi bấm gửi
         localStorage.setItem('user_class', classId);
         localStorage.setItem('user_email', email);
 
         btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang đồng bộ hóa...';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
         statusDiv.style.display = 'block';
         
-        // Sửa đường dẫn folder cho hợp lý với tên lớp có dấu gạch (vd 6/1 -> 6-1)
         const safeClassId = classId.replace(/\//g, '-');
         const folderPath = `/Confession/${safeClassId}/${email}`;
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
 
-        // --- BƯỚC 1: XỬ LÝ PROFILE.JSON ---
-        statusDiv.innerHTML = "🔄 Đang cập nhật hồ sơ người dùng...";
-        let uploadedFilesNames = [];
-        for (let i = 0; i < files.length; i++) { uploadedFilesNames.push(`${timestamp}_${files[i].name}`); }
+        // --- BƯỚC 1: CHUẨN BỊ DANH SÁCH FILE AN TOÀN ---
+        // Đổi tên file sang dạng không dấu ngay từ đầu
+        let fileQueue = [];
+        for (let i = 0; i < files.length; i++) {
+            // Kiểm tra dung lượng 150MB (Dropbox API upload session limit)
+            if (files[i].size > 150 * 1024 * 1024) {
+                alert(`⚠️ File "${files[i].name}" lớn hơn 150MB và sẽ bị bỏ qua.`);
+                continue;
+            }
+            
+            const originalName = files[i].name;
+            const safeName = sanitizeFilename(originalName);
+            const finalName = `${timestamp}_${safeName}`;
+            
+            // Tạo file mới với tên an toàn
+            const renamedFile = new File([files[i]], finalName, {type: files[i].type});
+            fileQueue.push(renamedFile);
+        }
 
+        // --- BƯỚC 2: CẬP NHẬT PROFILE.JSON ---
+        statusDiv.innerHTML = "🔄 Đang lưu hồ sơ...";
+        
+        // Tạo list tên file để lưu vào json
+        let uploadedFilesNames = fileQueue.map(f => f.name);
         const currentSession = {
             uploaded_at: new Date().toISOString(),
             note: textContent,
             files: uploadedFilesNames
         };
 
-        await updateProfileJson(folderPath, email, classId, currentSession);
+        // Retry cho file json luôn để chắc chắn folder được tạo
+        await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
 
-        // --- BƯỚC 2: UPLOAD MEDIA ---
+        // --- BƯỚC 3: UPLOAD MEDIA VỚI RETRY ---
         let successCount = 0;
-        let totalFiles = files.length;
+        let totalFiles = fileQueue.length;
 
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const newFileName = `${timestamp}_${file.name}`;
-            const renamedFile = new File([file], newFileName, {type: file.type});
+        for (let i = 0; i < totalFiles; i++) {
+            const file = fileQueue[i];
+            statusDiv.innerHTML = `Đang tải: ${file.name} (${i+1}/${totalFiles})...`;
             
-            statusDiv.innerHTML = `Đang tải: ${file.name} (${i+1}/${totalFiles})`;
+            // Thử upload tối đa 3 lần
+            const result = await uploadToDropboxWithRetry(file, folderPath, 3);
             
-            const result = await uploadToDropbox(renamedFile, folderPath, true);
-            if (result) successCount++;
+            if (result) {
+                successCount++;
+            } else {
+                console.error(`Thất bại file: ${file.name}`);
+            }
         }
 
+        // --- KẾT THÚC ---
         btn.disabled = false;
         btn.innerHTML = 'Gửi Lưu Bút';
-        statusDiv.innerHTML = `✅ <b>Thành công!</b>\nĐã lưu ${successCount} file.\nHẹn gặp lại bạn trong tương lai!`;
         
-        if (successCount > 0) {
-            document.getElementById('confessionText').value = "";
-            fileInput.value = "";
-            fileCountSpan.textContent = "";
-            // Sau khi gửi thành công, tải lại chế độ "nhớ thông tin" để khóa ô nhập
-            loadUserData();
+        if (successCount === totalFiles && totalFiles > 0) {
+            statusDiv.innerHTML = `✅ <b>Thành công tuyệt đối!</b>\nĐã lưu đủ ${successCount}/${totalFiles} file.`;
+            resetForm();
+        } else if (successCount > 0) {
+            statusDiv.innerHTML = `⚠️ <b>Hoàn tất một phần</b>\nĐã lưu được ${successCount}/${totalFiles} file.\n(Có thể do mạng yếu, hãy thử gửi lại các file chưa lên).`;
+            resetForm(); // Vẫn reset form vì đã có file lên
+        } else if (totalFiles === 0 && textContent !== "") {
+            statusDiv.innerHTML = `✅ <b>Đã lưu lời nhắn thành công!</b>`;
+            resetForm();
+        } else {
+            statusDiv.innerHTML = `❌ <b>Lỗi kết nối</b>. Vui lòng kiểm tra mạng và thử lại.`;
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('confessionText').value = "";
+        fileInput.value = "";
+        fileCountSpan.textContent = "";
+        loadUserData();
+    }
+
+    // --- Helper: Update JSON có Retry ---
+    async function updateProfileJsonWithRetry(folderPath, email, classId, sessionData) {
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                await updateProfileJson(folderPath, email, classId, sessionData);
+                return; // Thành công
+            } catch (e) {
+                console.warn("Lỗi update JSON, thử lại...", e);
+                retries--;
+                await new Promise(r => setTimeout(r, 1000)); // Đợi 1s
+            }
         }
     }
 
@@ -353,6 +396,7 @@
             history: []
         };
 
+        // 1. Thử download file cũ (nếu có)
         try {
             const downloadResp = await fetch('https://content.dropboxapi.com/2/files/download', {
                 method: 'POST',
@@ -360,19 +404,20 @@
             });
 
             if (downloadResp.ok) {
-                const blob = await downloadResp.blob();
-                const text = await blob.text();
+                const text = await downloadResp.text(); // Dùng text() an toàn hơn blob() cho JSON
                 profile = JSON.parse(text);
             }
-        } catch (e) {}
+        } catch (e) { /* File chưa tồn tại, bỏ qua */ }
 
+        // 2. Cập nhật data mới
         profile.history.push(sessionData);
         profile.last_updated = new Date().toISOString();
 
+        // 3. Upload lại (Overwrite)
         const jsonFile = new File([JSON.stringify(profile, null, 2)], jsonFileName, { type: 'application/json' });
         const args = { "path": fullPath, "mode": "overwrite", "autorename": false, "mute": true };
 
-        await fetch('https://content.dropboxapi.com/2/files/upload', {
+        const uploadResp = await fetch('https://content.dropboxapi.com/2/files/upload', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + ACCESS_TOKEN,
@@ -381,23 +426,42 @@
             },
             body: jsonFile
         });
+        
+        if (!uploadResp.ok) throw new Error("JSON Upload failed");
     }
 
-    async function uploadToDropbox(file, folderPath, isMedia) {
-        const fullPath = `${folderPath}/${file.name}`;
-        const args = { "path": fullPath, "mode": "add", "autorename": true, "mute": false };
-        try {
-            const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + ACCESS_TOKEN,
-                    'Content-Type': 'application/octet-stream',
-                    'Dropbox-API-Arg': JSON.stringify(args)
-                },
-                body: file
-            });
-            return response.ok;
-        } catch (error) { return false; }
+    // --- Helper: Upload File có Retry ---
+    async function uploadToDropboxWithRetry(file, folderPath, maxRetries = 3) {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                // Kiểm tra lại file size lần cuối
+                const fullPath = `${folderPath}/${file.name}`;
+                // Quan trọng: Dropbox API yêu cầu Header phải là ASCII. 
+                // Hàm sanitizeFilename ở trên đã xử lý tên file, nên ở đây JSON.stringify sẽ an toàn.
+                
+                const args = { "path": fullPath, "mode": "add", "autorename": true, "mute": false };
+                
+                const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + ACCESS_TOKEN,
+                        'Content-Type': 'application/octet-stream',
+                        'Dropbox-API-Arg': JSON.stringify(args)
+                    },
+                    body: file
+                });
+
+                if (response.ok) return true; // Thành công
+                
+                // Nếu lỗi server (5xx) thì thử lại, lỗi client (4xx) thì có thể dừng
+                if (response.status >= 500) throw new Error("Server Error");
+                
+            } catch (error) {
+                console.warn(`Lỗi upload lần ${i+1}, đang thử lại...`, error);
+                await new Promise(r => setTimeout(r, 1500)); // Đợi 1.5s trước khi thử lại
+            }
+        }
+        return false; // Thất bại sau 3 lần
     }
 </script>
 
