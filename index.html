@@ -60,12 +60,18 @@
         <div class="modal-icon"><i class="fas fa-camera-retro"></i></div>
         <div class="modal-title">Chào bạn!</div>
         <div class="modal-desc modal-center-desc">
-            Bạn có thể upload ảnh và video kỷ niệm của mình lên đây.<br>
-            Tất cả kỷ niệm của bạn sẽ được gom gọn vào một hồ sơ duy nhất để gửi lại cho bạn sau này.<br><br>
-            Mỗi file tối đa <b>100MB</b>, nếu file lớn hơn hãy liên hệ admin nhé!<br>
-            <br><br>Trước khi bắt đầu, vui lòng đọc kỹ <b><a onclick="openModal('privacyModal')">Chính sách & Quyền Riêng Tư</a></b>.
+            Đây là nơi để bạn <b>tải lên ảnh hoặc video kỷ niệm</b> của mình.<br>
+            Tất cả kỷ niệm sẽ được lưu lại chung trong một hồ sơ để gửi lại cho bạn sau này.<br><br>
+
+            📌 <b>Lưu ý nhỏ:</b><br>
+            • Mỗi file tối đa <b>100MB</b><br>
+            • Nên upload <b>1–2 ảnh trước</b> để thử xem có thành công không<br>
+            • Khi thấy <b>thông báo upload thành công</b> thì mới tiếp tục upload nhiều ảnh nhé!<br><br>
+
+            Trước khi bắt đầu, bạn vui lòng đọc kỹ<br>
+            <b><a onclick="openModal('privacyModal')">Chính sách & Quyền Riêng Tư</a></b>.
         </div>
-        <button class="modal-btn" onclick="closeModal('introModal')">Đã hiểu!</button>
+        <button class="modal-btn" onclick="closeModal('introModal')">Mình đã hiểu</button>
     </div>
 </div>
 
@@ -74,22 +80,38 @@
         <span class="close-modal-top" onclick="closeModal('privacyModal')">&times;</span>
         <div class="modal-title" style="text-align: center;">Chính sách & Quyền Riêng Tư</div>
         <div class="modal-desc policy-content">
-            <p>Chào mừng bạn đến với <b>Nơi lưu giữ kỷ niệm</b>. Trước khi tải lên hình ảnh hoặc video, vui lòng đọc kỹ các điều khoản sau:</p>
+            <p>
+                Chào bạn! Trước khi tải ảnh hoặc video lên <b>Nơi lưu giữ kỷ niệm</b>, 
+                bạn hãy đọc kỹ những điều sau nhé:
+            </p>
             
-            <h4>1. Quyền sử dụng hình ảnh</h4>
-            <p>Bằng việc thực hiện thao tác tải ảnh/video lên hệ thống này, bạn đồng ý vô điều kiện cho phép Ban quản trị/Người tạo website được quyền sử dụng, sao chép, chỉnh sửa, và phân phối các nội dung này nhằm mục đích: <b>truyền tải thông điệp, làm kỷ yếu, video kỷ niệm chung, hoặc các hoạt động phi thương mại khác</b> liên quan đến tập thể.</p>
+            <h4>1. Về việc sử dụng hình ảnh</h4>
+            <p>
+                Khi bạn upload ảnh hoặc video, bạn đồng ý cho Ban quản trị được sử dụng 
+                các nội dung này để làm <b>kỷ yếu, video kỷ niệm, hoặc các hoạt động chung của lớp</b>. 
+                Các nội dung này <b>không dùng cho mục đích thương mại</b>.
+            </p>
             
-            <h4>2. Miễn trừ trách nhiệm xin phép</h4>
-            <p>Chúng tôi có quyền sử dụng các hình ảnh bạn đã upload mà <b>không cần phải xin phép lại</b> hoặc thông báo trước cho bạn trong từng trường hợp cụ thể. Bạn xác nhận rằng bạn có đầy đủ quyền đối với các hình ảnh bạn tải lên và việc chúng tôi sử dụng chúng không vi phạm quyền của bên thứ ba.</p>
+            <h4>2. Quyền đồng ý</h4>
+            <p>
+                Ảnh và video bạn tải lên có thể được sử dụng lại cho các hoạt động chung 
+                mà <b>không cần xin phép lại từng lần</b>. 
+                Bạn hãy chắc chắn rằng ảnh/video đó là do bạn chụp hoặc được phép sử dụng nhé.
+            </p>
 
-            <h4>3. Bảo mật thông tin liên lạc</h4>
-            <p>Email và Tên lớp của bạn chỉ được sử dụng duy nhất cho mục đích định danh thư mục và gửi lại ảnh cho bạn trong tương lai. Chúng tôi cam kết không chia sẻ email này cho bên thứ ba.</p>
+            <h4>3. Thông tin cá nhân</h4>
+            <p>
+                Email và tên lớp chỉ dùng để <b>lưu ảnh đúng thư mục</b> 
+                và <b>gửi lại kỷ niệm cho bạn sau này</b>. 
+                Chúng tôi cam kết <b>không chia sẻ thông tin này cho người khác</b>.
+            </p>
         </div>
         <div style="text-align: center;">
-            <button class="modal-btn" onclick="closeModal('privacyModal')">Tôi đồng ý</button>
+            <button class="modal-btn" onclick="closeModal('privacyModal')">Mình đồng ý</button>
         </div>
     </div>
 </div>
+
 
 <div class="main-wrapper">
     <div class="confession-box">
@@ -527,7 +549,7 @@
                 await updateProfileJsonWithRetry(folderPath, email, classId, currentSession);
                 
                 progressBar.style.width = '100%';
-                statusDiv.innerHTML = `✅ <b>Hoàn tất!</b> Đã lưu ${successfulFileNames.length} file.`;
+                statusDiv.innerHTML = `✅ <b>Hoàn tất!</b> Đã lưu ${successfulFileNames.length} file. Hẹn bạn trong tương lai`;
                 
                 checkExistingMemories(classId, email);
                 // Reset
