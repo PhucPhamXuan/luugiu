@@ -2,32 +2,499 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Thông báo bảo trì</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nơi Lưu Giữ Kỷ Niệm (Cloudinary + Dropbox JSON)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* GIỮ NGUYÊN CSS CŨ */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f0f2f5; display: flex; flex-direction: column; align-items: center; min-height: 100vh; color: #1c1e21; }
+        .main-wrapper { flex: 1; display: flex; justify-content: center; align-items: center; width: 100%; padding: 10px; }
+        .confession-box { background: white; width: 100%; max-width: 500px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); overflow: hidden; position: relative; }
+        .header { padding: 16px; border-bottom: 1px solid #e4e6eb; text-align: center; font-weight: bold; font-size: 1.3rem; color: #1877f2; }
+        .content-area { padding: 16px; }
+        .input-group { margin-bottom: 12px; position: relative; }
+        .input-group label { display: block; font-size: 0.9rem; color: #1c1e21; margin-bottom: 6px; font-weight: 600;}
+        .input-field { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; transition: border 0.2s, background 0.2s; }
+        .input-field:focus { border-color: #1877f2; }
+        .input-field:disabled { background-color: #f0f2f5; color: #65676b; cursor: not-allowed; }
+        .change-info-btn { position: absolute; right: 0; top: 0; font-size: 0.8rem; color: #1877f2; cursor: pointer; text-decoration: underline; display: none; }
+        textarea.confession-text { width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 12px; resize: none; font-size: 1rem; min-height: 100px; outline: none; margin-bottom: 10px; font-family: inherit; }
+        #fileInput { display: none; }
+        .media-upload-btn { display: flex; justify-content: center; align-items: center; padding: 15px; background-color: #f7f8fa; border: 1px dashed #ccd0d5; color: #606770; border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; margin-bottom: 10px; }
+        .media-upload-btn:hover { background-color: #ebedf0; }
+        .media-upload-btn i { margin-right: 8px; color: #45bd62; font-size: 1.3rem; }
+        #fileCount { display: block; text-align: center; font-size: 0.9rem; color: #1877f2; margin-bottom: 15px; font-weight: bold;}
+        .submit-btn { width: 100%; padding: 14px; background-color: #1877f2; color: white; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .submit-btn:hover { background-color: #166fe5; }
+        .submit-btn:disabled { background-color: #b0c4de; cursor: not-allowed; }
+        #status { margin-top: 16px; padding: 12px; background-color: #e7f3ff; border-radius: 8px; font-size: 0.9rem; white-space: pre-line; display: none; color: #0c5460; }
+        #memory-stats { text-align: center; font-size: 0.9rem; color: #65676b; margin-bottom: 15px; background: #f0f2f5; padding: 8px; border-radius: 6px; display: none; }
+        #memory-stats strong { color: #1877f2; }
+        
+        /* Progress Bar */
+        .progress-container { width: 100%; background: #e4e6eb; border-radius: 8px; height: 8px; margin: 10px 0; overflow: hidden; display: none; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #1877f2, #42b72a); transition: width 0.3s; width: 0%; }
+
+        footer { width: 100%; text-align: center; padding: 20px; font-size: 0.85rem; color: #65676b; background: #fff; border-top: 1px solid #e4e6eb; margin-top: 20px; }
+        footer a { color: #1877f2; text-decoration: none; font-weight: 600; cursor: pointer; }
+        footer a:hover { text-decoration: underline; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: all 0.3s ease; }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        .modal-box { background: white; padding: 25px; border-radius: 12px; max-width: 90%; width: 450px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.25); transform: scale(0.9); transition: transform 0.3s ease; max-height: 80vh; overflow-y: auto; }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+        .modal-icon { font-size: 3rem; color: #1877f2; margin-bottom: 15px; }
+        .modal-title { font-size: 1.3rem; font-weight: bold; margin-bottom: 12px; }
+        .modal-desc { font-size: 1rem; color: #666; margin-bottom: 25px; line-height: 1.6; text-align: left;}
+        .modal-center-desc { text-align: center; }
+        .modal-btn { padding: 12px 30px; background: #1877f2; color: white; border: none; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        .close-modal-top { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; }
+        .policy-content p { margin-bottom: 10px; }
+        .policy-content h4 { margin-top: 15px; margin-bottom: 5px; color: #333; }
+    </style>
 </head>
-<body class="min-h-screen flex items-center justify-center bg-white text-gray-800">
+<body>
 
-<div class="w-full max-w-md p-8 border rounded-xl shadow-md text-center">
-    <div class="text-5xl mb-4">🛠️</div>
+<div class="modal-overlay" id="introModal">
+    <div class="modal-box">
+        <div class="modal-icon"><i class="fas fa-camera-retro"></i></div>
+        <div class="modal-title">Chào bạn!</div>
+        <div class="modal-desc modal-center-desc">
+            Đây là nơi để bạn <b>tải lên ảnh hoặc video kỷ niệm</b> của mình.<br>
+            Tất cả kỷ niệm sẽ được lưu lại chung trong một hồ sơ để gửi lại cho bạn sau này.<br><br>
 
-    <h1 class="text-2xl font-bold mb-3">
-        Hệ thống đang bảo trì
-    </h1>
+            📌 <b>Lưu ý nhỏ:</b><br>
+            • Mỗi file tối đa <b>100MB</b><br>
+            • Nên upload <b>1–2 ảnh trước</b> để thử xem có thành công không<br>
+            • Khi thấy <b>thông báo upload thành công</b> thì mới tiếp tục upload nhiều ảnh nhé!<br><br>
 
-    <p class="text-sm text-gray-600 mb-4">
-        Website đang được nâng cấp để mang đến trải nghiệm tốt hơn.
-        Cảm ơn bạn đã dành thời gian ghé thăm. Hẹn gặp lại!
-    </p>
-
-    <div class="inline-block px-4 py-2 text-sm bg-gray-100 rounded-full mb-4">
-        Thời gian dự kiến: 20:00 – 23:00
-    </div>
-
-    <div class="text-sm text-gray-500">
-        Xin lỗi vì sự bất tiện này.
+            Trước khi bắt đầu, bạn vui lòng đọc kỹ<br>
+            <b><a onclick="openModal('privacyModal')">Chính sách & Quyền Riêng Tư</a></b>.
+        </div>
+        <button class="modal-btn" onclick="closeModal('introModal')">Mình đã hiểu</button>
     </div>
 </div>
 
+<div class="modal-overlay" id="privacyModal">
+    <div class="modal-box" style="text-align: left;">
+        <span class="close-modal-top" onclick="closeModal('privacyModal')">&times;</span>
+        <div class="modal-title" style="text-align: center;">Chính sách & Quyền Riêng Tư</div>
+        <div class="modal-desc policy-content">
+            <p>
+                Chào bạn! Trước khi tải ảnh hoặc video lên <b>Nơi lưu giữ kỷ niệm</b>, 
+                bạn hãy đọc kỹ những điều sau nhé:
+            </p>
+            
+            <h4>1. Về việc sử dụng hình ảnh</h4>
+            <p>
+                Khi bạn upload ảnh hoặc video, bạn đồng ý cho Ban quản trị được sử dụng 
+                các nội dung này để làm <b>kỷ yếu, video kỷ niệm, hoặc các hoạt động chung của lớp</b>. 
+                Các nội dung này <b>không dùng cho mục đích thương mại</b>.
+            </p>
+            
+            <h4>2. Quyền đồng ý</h4>
+            <p>
+                Ảnh và video bạn tải lên có thể được sử dụng lại cho các hoạt động chung 
+                mà <b>không cần xin phép lại từng lần</b>. 
+                Bạn hãy chắc chắn rằng ảnh/video đó là do bạn chụp hoặc được phép sử dụng nhé.
+            </p>
+
+            <h4>3. Thông tin cá nhân</h4>
+            <p>
+                Email và tên lớp chỉ dùng để <b>lưu ảnh đúng thư mục</b> 
+                và <b>gửi lại kỷ niệm cho bạn sau này</b>. 
+                Chúng tôi cam kết <b>không chia sẻ thông tin này cho người khác</b>.
+            </p>
+        </div>
+        <div style="text-align: center;">
+            <button class="modal-btn" onclick="closeModal('privacyModal')">Mình đồng ý</button>
+        </div>
+    </div>
+</div>
+
+
+<div class="main-wrapper">
+    <div class="confession-box">
+        <div class="header">Nơi lưu giữ kỷ niệm</div>
+        <div class="content-area">
+            <div class="input-group">
+                <label>Tên Lớp (Ví dụ: 6/1, 8/2,...)</label>
+                <span class="change-info-btn" id="changeClassBtn" onclick="enableEdit()">[Đổi thông tin]</span>
+                <input type="text" class="input-field" id="classId" placeholder="Nhập lớp...">
+            </div>
+            <div class="input-group">
+                <label>Email (Dùng chung cho các lần gửi)</label>
+                <input type="email" class="input-field" id="userEmail" placeholder="Nhập email của bạn...">
+            </div>
+
+            <div id="memory-stats">
+                <i class="fas fa-spinner fa-spin"></i> Đang kiểm tra kho lưu trữ...
+            </div>
+
+            <div class="input-group">
+                 <label>Lời nhắn gửi hoặc mô tả</label>
+                <textarea class="confession-text" id="confessionText" placeholder="Kể về kỷ niệm này..."></textarea>
+            </div>
+            <label for="fileInput" class="media-upload-btn">
+                <i class="fas fa-images"></i> Chọn Ảnh/Video (Max 100MB/file)
+            </label>
+            <span id="fileCount"></span>
+            <input type="file" id="fileInput" multiple accept="image/*,video/*">
+            
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <button class="submit-btn" id="uploadBtn" onclick="submitConfession()">Gửi Lưu Bút</button>
+            <div id="status"></div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div>&copy;Archive System 2026 v6</div>
+    <div style="margin-top: 8px;">
+        Liên hệ Admin: <a href="mailto:phucphamxuan1234@gmail.com">Gửi Mail</a> | 
+        <a onclick="openModal('privacyModal')">Chính sách Quyền riêng tư</a>
+    </div>
+</footer>
+
+<script>
+    // ============================================================
+    // 1. CẤU HÌNH (Dropbox cho JSON, Cloudinary cho Media)
+    // ============================================================
+    
+    // --- DROPBOX (Để lưu Profile JSON & Folder) ---
+    const DB_APP_KEY = 'gmrkyo6hyxilwcx'; 
+    const DB_APP_SECRET = 'sgs2qwv8ajkmoej';
+    const DB_REFRESH_TOKEN = '_6kRRl2INtYAAAAAAAAAAe3vMn04ROpuXPbugAFCwnJgEX9lFgGKoG4nwBG563Sa';
+
+    // --- CLOUDINARY (Để lưu Ảnh/Video) ---
+    const CLOUD_NAME = "dezypmyyr";
+    const UPLOAD_PRESET = "web_upload";
+    const CLOUDINARY_API = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`;
+
+    // ============================================================
+    // 2. LOGIC DROPBOX AUTH (Giữ nguyên để xử lý JSON)
+    // ============================================================
+    let cachedToken = null;
+    let tokenExpiresAt = 0;
+
+    async function getValidToken() {
+        if (!cachedToken || Date.now() >= tokenExpiresAt) {
+            return await refreshAccessToken();
+        }
+        return cachedToken;
+    }
+
+    async function refreshAccessToken() {
+        try {
+            const body = new URLSearchParams({
+                grant_type: "refresh_token",
+                refresh_token: DB_REFRESH_TOKEN,
+                client_id: DB_APP_KEY,
+                client_secret: DB_APP_SECRET,
+            });
+            const r = await fetch("https://api.dropbox.com/oauth2/token", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: body
+            });
+            if (!r.ok) throw new Error("Lỗi Token Dropbox");
+            const data = await r.json();
+            cachedToken = data.access_token;
+            tokenExpiresAt = Date.now() + (data.expires_in * 1000) - 120000;
+            return cachedToken;
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
+    }
+
+    // ============================================================
+    // 3. LOGIC APP
+    // ============================================================
+    
+    window.onload = function() {
+        setTimeout(() => { document.getElementById('introModal').classList.add('active'); }, 500);
+        loadUserData();
+    }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // --- Quản lý User/Cache ---
+    function loadUserData() {
+        const savedClass = localStorage.getItem('user_class');
+        const savedEmail = localStorage.getItem('user_email');
+        if (savedClass && savedEmail) {
+            document.getElementById('classId').value = savedClass;
+            document.getElementById('userEmail').value = savedEmail;
+            document.getElementById('classId').disabled = true;
+            document.getElementById('userEmail').disabled = true;
+            document.getElementById('changeClassBtn').style.display = 'inline';
+            checkProfileStats(savedClass, savedEmail);
+        } else {
+            document.getElementById('memory-stats').style.display = 'none';
+        }
+    }
+
+    function enableEdit() {
+        if (confirm("Xóa thông tin cũ để nhập lại?")) {
+            localStorage.removeItem('user_class');
+            localStorage.removeItem('user_email');
+            location.reload();
+        }
+    }
+
+    // --- API: Cloudinary Upload (Tối ưu hóa) ---
+    async function uploadToCloudinary(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", UPLOAD_PRESET);
+
+        try {
+            const r = await fetch(CLOUDINARY_API, {
+                method: "POST",
+                body: formData
+            });
+            const data = await r.json();
+            
+            if (data.secure_url) {
+                return data.secure_url;
+            } else {
+                console.error("Cloudinary Error:", data);
+                return null;
+            }
+        } catch (e) {
+            console.error("Network/Upload Error:", e);
+            return null;
+        }
+    }
+
+    // --- Helper: Upload Parallel with Limit (Tránh treo trình duyệt) ---
+    async function uploadFilesBatch(files, onProgress) {
+        const urls = [];
+        let completed = 0;
+        const total = files.length;
+        
+        // Chuyển FileList sang Array để dễ xử lý
+        const fileArray = Array.from(files);
+        
+        // Tùy chỉnh số lượng upload song song (Mobile: 2, PC: 4)
+        const BATCH_SIZE = /Mobi|Android/i.test(navigator.userAgent) ? 2 : 4;
+
+        for (let i = 0; i < total; i += BATCH_SIZE) {
+            const chunk = fileArray.slice(i, i + BATCH_SIZE);
+            const promises = chunk.map(file => uploadToCloudinary(file).then(url => {
+                completed++;
+                if(onProgress) onProgress(completed, total);
+                return url;
+            }));
+            
+            const results = await Promise.all(promises);
+            results.forEach(url => {
+                if (url) urls.push(url);
+            });
+        }
+        return urls;
+    }
+
+    // --- API: Dropbox - Check Stats ---
+    async function checkProfileStats(classId, email) {
+        const statsDiv = document.getElementById('memory-stats');
+        statsDiv.style.display = 'block';
+        
+        const safeClassId = classId.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-').replace(/\//g, '-');
+        const safeEmail = email.trim().toLowerCase();
+        const fullPath = `/Confession/${safeClassId}/${safeEmail}/profile.json`;
+
+        try {
+            const token = await getValidToken();
+            const r = await fetch("https://content.dropboxapi.com/2/files/download", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Dropbox-API-Arg": JSON.stringify({ path: fullPath })
+                }
+            });
+
+            if (r.status === 409 || r.status === 404) {
+                statsDiv.innerHTML = 'Chào bạn! Đây là lần đầu bạn lưu trữ ở đây phải không?.';
+                return;
+            }
+            if (!r.ok) throw new Error("API Err");
+
+            const profile = await r.json();
+            let totalMemories = profile.history ? profile.history.length : 0;
+            let totalFiles = 0;
+            if (profile.history) {
+                profile.history.forEach(h => {
+                    if (h.files) totalFiles += h.files.length;
+                });
+            }
+            statsDiv.innerHTML = `Đã lưu <strong>${totalMemories}</strong> lần gửi với <strong>${totalFiles}</strong> ảnh/video.`;
+
+        } catch (e) {
+            console.warn(e);
+            statsDiv.innerHTML = 'Không thể tải thông tin cũ.';
+        }
+    }
+
+    // --- API: Dropbox - Ensure Folder & Update JSON ---
+    async function ensureFolder(path) {
+        try {
+            const token = await getValidToken();
+            await fetch("https://api.dropboxapi.com/2/files/create_folder_v2", {
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+                body: JSON.stringify({ path: path, autorename: false })
+            });
+        } catch(e) {} // Bỏ qua nếu folder đã tồn tại
+    }
+
+    async function updateProfileJson(folderPath, email, classId, historyItem) {
+        const token = await getValidToken();
+        const fullPath = `${folderPath}/profile.json`;
+        
+        // 1. Template mặc định
+        let profile = { 
+            user_email: email, 
+            user_class: classId, 
+            created_at: new Date().toISOString(), 
+            last_updated: new Date().toISOString(), 
+            history: [] 
+        };
+
+        // 2. Thử tải JSON cũ
+        try {
+            const downloadResp = await fetch("https://content.dropboxapi.com/2/files/download", {
+                method: 'POST',
+                headers: { 
+                    'Authorization': `Bearer ${token}`,
+                    'Dropbox-API-Arg': JSON.stringify({ "path": fullPath }) 
+                }
+            });
+            if (downloadResp.ok) {
+                const oldData = await downloadResp.json();
+                // Merge dữ liệu cũ
+                profile = { ...profile, ...oldData }; 
+            }
+        } catch (e) { console.log("Tạo JSON mới..."); }
+
+        // 3. Cập nhật dữ liệu mới
+        profile.last_updated = new Date().toISOString();
+        if (!profile.history) profile.history = [];
+        profile.history.push(historyItem); // historyItem chứa mảng URLs
+
+        // 4. Ghi đè lên Dropbox
+        const jsonBlob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
+        
+        await fetch("https://content.dropboxapi.com/2/files/upload", {
+            method: 'POST',
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/octet-stream', 
+                'Dropbox-API-Arg': JSON.stringify({ "path": fullPath, "mode": "overwrite", "mute": true }) 
+            },
+            body: jsonBlob
+        });
+    }
+
+    // ============================================================
+    // 4. MAIN SUBMIT FUNCTION
+    // ============================================================
+    
+    const fileInput = document.getElementById('fileInput');
+    fileInput.addEventListener('change', function() {
+        document.getElementById('fileCount').textContent = this.files.length > 0 ? `Đã chọn ${this.files.length} file` : '';
+    });
+
+    async function submitConfession() {
+        const classId = document.getElementById('classId').value.trim().toUpperCase().replace(/[^A-Z0-9\/]/g, '-');
+        const email = document.getElementById('userEmail').value.trim().toLowerCase();
+        const textContent = document.getElementById('confessionText').value.trim();
+        const files = fileInput.files;
+        
+        const btn = document.getElementById('uploadBtn');
+        const statusDiv = document.getElementById('status');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+
+        // Validation
+        if (!classId || !email) return alert("Vui lòng nhập Tên Lớp và Email!");
+        if (files.length === 0 && textContent === "") return alert("Hãy chọn ảnh hoặc viết lời nhắn!");
+
+        // Save User Info
+        localStorage.setItem('user_class', classId);
+        localStorage.setItem('user_email', email);
+
+        // UI Busy State
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+        statusDiv.style.display = 'block';
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '5%';
+
+        const safeClassId = classId.replace(/\//g, '-');
+        const folderPath = `/Confession/${safeClassId}/${email}`;
+        
+        try {
+            // Bước 1: Tạo folder trên Dropbox (để chứa json)
+            statusDiv.innerHTML = "📁 Đang khởi tạo hồ sơ...";
+            await ensureFolder(folderPath);
+
+            // Bước 2: Upload Files lên Cloudinary
+            let uploadedUrls = [];
+            if (files.length > 0) {
+                statusDiv.innerHTML = `☁️ Đang upload lên Cloudinary... (0/${files.length})`;
+                
+                uploadedUrls = await uploadFilesBatch(files, (completed, total) => {
+                    const percent = Math.round((completed / total) * 90); // Max 90% cho phần ảnh
+                    progressBar.style.width = percent + '%';
+                    statusDiv.innerHTML = `☁️ Đang upload: ${completed}/${total} file`;
+                });
+            }
+
+            // Bước 3: Cập nhật JSON trên Dropbox
+            if (uploadedUrls.length > 0 || textContent !== "") {
+                progressBar.style.width = '95%';
+                statusDiv.innerHTML = "📝 Đang cập nhật Profile JSON...";
+
+                const historyItem = {
+                    uploaded_at: new Date().toISOString(),
+                    note: textContent,
+                    files: uploadedUrls // Mảng URL từ Cloudinary
+                };
+
+                await updateProfileJson(folderPath, email, classId, historyItem);
+
+                // Hoàn tất
+                progressBar.style.width = '100%';
+                statusDiv.innerHTML = `✅ <b>Thành công!</b> Đã lưu ${uploadedUrls.length} ảnh/video vào hồ sơ.`;
+                
+                // Reset Form
+                document.getElementById('confessionText').value = "";
+                fileInput.value = "";
+                document.getElementById('fileCount').textContent = "";
+                checkProfileStats(classId, email); // Update stats hiển thị
+
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    progressBar.style.width = '0%';
+                }, 3000);
+
+            } else {
+                statusDiv.innerHTML = "❌ Không có dữ liệu nào được lưu (Lỗi upload ảnh).";
+            }
+
+        } catch (e) {
+            console.error(e);
+            statusDiv.innerHTML = `❌ Lỗi: ${e.message}`;
+            alert("Có lỗi xảy ra. Kiểm tra console.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Gửi Lưu Bút';
+        }
+    }
+</script>
 </body>
 </html>
