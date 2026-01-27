@@ -2,52 +2,74 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>System Check</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         body {
             margin: 0;
-            font-family: Inter, system-ui, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background: #ffffff;
+            overflow: hidden;
         }
 
         /* ===== FULLSCREEN LOADING VIDEO ===== */
         #loading-screen {
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100dvh; 
+            /* Đảm bảo nền trùng với màu nền của video (trắng) */
             background: #ffffff;
             z-index: 9999;
             display: none;
             align-items: center;
             justify-content: center;
-            animation: fadeIn 0.6s ease forwards;
+            overflow: hidden;
         }
 
         #loading-screen video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            pointer-events: none; /* chặn user */
+            /* Thay đổi từ cover sang contain để không bị mất 2 bên */
+            object-fit: contain;
+            object-position: center;
+            pointer-events: none;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0 }
-            to { opacity: 1 }
+        /* Hiệu ứng mờ dần khi chuyển cảnh */
+        .fade-out {
+            animation: fadeOut 0.8s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
         }
 
         /* ===== MAINTENANCE PAGE ===== */
         #maintenance {
-            min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
+            padding: 20px;
+            background: radial-gradient(circle at center, #ffffff 0%, #f9fafb 100%);
         }
 
         .box {
             max-width: 420px;
+            width: 100%;
+            padding: 2rem;
+            border-radius: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            h1 { font-size: 1.5rem !important; }
+            p { font-size: 0.875rem !important; }
         }
     </style>
 </head>
@@ -58,12 +80,14 @@
 ================================ -->
 <div id="loading-screen">
     <video
+        id="video-player"
         autoplay
         muted
         playsinline
         loop
         preload="auto">
         <source src="https://cdn.dribbble.com/userupload/18220933/file/original-2f9b699a4f79d031ab97478a41c2056d.mp4" type="video/mp4">
+        Trình duyệt của bạn không hỗ trợ video.
     </video>
 </div>
 
@@ -71,42 +95,50 @@
      MAINTENANCE CONTENT
 ================================ -->
 <div id="maintenance">
-    <div class="box">
-        <h1 class="text-3xl font-extrabold text-gray-900 mb-4">
+    <div class="box bg-white shadow-xl sm:shadow-none border border-gray-100 sm:border-none">
+        <div class="mb-6 flex justify-center">
+            <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>
+        </div>
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">
             Hệ thống đang bảo trì
         </h1>
-        <p class="text-gray-500 text-sm">
-            Chúng tôi đang nâng cấp hệ thống.<br>
-            Vui lòng quay lại sau.
+        <p class="text-gray-500 leading-relaxed">
+            Chúng tôi đang nâng cấp trải nghiệm tốt hơn.<br>
+            Quá trình này sẽ hoàn tất sớm, vui lòng quay lại sau.
         </p>
     </div>
 </div>
 
 <script>
-/* ===============================
-   CÔNG TẮC BẢO TRÌ
-   true  = đang bảo trì
-   false = hoạt động bình thường
-================================ */
-const MAINTENANCE_MODE = false;
+const MAINTENANCE_MODE = true;
 
 const loading = document.getElementById("loading-screen");
 const maintenance = document.getElementById("maintenance");
+const video = document.getElementById("video-player");
 
 if (!MAINTENANCE_MODE) {
-    // Ẩn maintenance
     maintenance.style.display = "none";
-
-    // Hiện loading video
     loading.style.display = "flex";
 
-    // Khoá scroll
-    document.body.style.overflow = "hidden";
+    video.play().catch(error => {
+        console.log("Autoplay was prevented");
+    });
 
-    // Đợi animation/video chạy rồi redirect
     setTimeout(() => {
-        window.location.replace("main.html");
-    }, 9000); // chỉnh thời gian theo độ dài animation
+        loading.classList.add('fade-out');
+        setTimeout(() => {
+            // Thay "main.html" bằng URL thực tế của bạn
+            // window.location.replace("main.html");
+            console.log("Redirecting to main.html...");
+        }, 800); 
+    }, 8200); 
+} else {
+    document.body.style.overflow = "auto";
+    loading.style.display = "none";
 }
 </script>
 
