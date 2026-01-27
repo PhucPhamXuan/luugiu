@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảo Trì Định Kì Hệ Thống</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            overflow: hidden;
+        }
+
+        /* Hiệu ứng nền Aurora chuyển động */
+        .aurora-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 30%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 70%, rgba(14, 165, 233, 0.15) 0%, transparent 50%);
+            animation: aurora-float 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes aurora-float {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.1) translate(2%, 2%); }
+        }
+
+        /* Glassmorphism Card */
+        .glass-container {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Văn bản Gradient */
+        .text-gradient {
+            background: linear-gradient(135deg, #818cf8 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Hiệu ứng xung cho Icon */
+        .icon-pulse {
+            animation: soft-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes soft-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4)); }
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4f46e5, #0ea5e9);
+            width: 0%;
+            transition: width 1s linear;
+        }
+
+        .countdown-digit {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="aurora-bg"></div>
+
+    <div class="max-w-xl w-full z-10">
+        <div class="glass-container rounded-[2.5rem] p-8 md:p-12 text-center">
+            
+            <!-- Icon Bảo trì -->
+            <div class="flex justify-center mb-6">
+                <div class="icon-pulse bg-white/5 p-4 rounded-3xl border border-white/10">
+                    <svg class="w-12 h-12 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-4 tracking-tight">
+                Bảo Trì <span class="text-gradient">Định Kì</span> Hệ Thống
+            </h1>
+            
+            <p class="text-slate-400 mb-10 text-sm md:text-base leading-relaxed">
+                Hệ thống đang được nâng cấp để phục vụ bạn tốt hơn.<br>
+                Dự kiến hoàn thành: <span class="text-white font-semibold">16:00 (4h Chiều)</span>
+            </p>
+
+            <!-- Countdown Timer -->
+            <div class="grid grid-cols-3 gap-4 mb-10">
+                <div class="bg-white/5 rounded-2xl py-4 px-2 border border-white/5">
+                    <div id="hours" class="text-3xl md:text-4xl font-bold text-white countdown-digit">00</div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-500 mt-1 font-bold">Giờ</div>
+                </div>
+                <div class="bg-white/5 rounded-2xl py-4 px-2 border border-white/5">
+                    <div id="minutes" class="text-3xl md:text-4xl font-bold text-white countdown-digit">00</div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-500 mt-1 font-bold">Phút</div>
+                </div>
+                <div class="bg-white/5 rounded-2xl py-4 px-2 border border-white/5">
+                    <div id="seconds" class="text-3xl md:text-4xl font-bold text-white countdown-digit">00</div>
+                    <div class="text-[10px] uppercase tracking-widest text-slate-500 mt-1 font-bold">Giây</div>
+                </div>
+            </div>
+
+            <!-- Progress section -->
+            <div class="mb-8">
+                <div class="flex justify-between items-end mb-2">
+                    <span class="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Trạng thái công việc</span>
+                    <span id="percent-text" class="text-sm font-bold text-indigo-400">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progress-fill" class="progress-fill"></div>
+                </div>
+            </div>
+
+            <div id="status-msg" class="text-xs text-slate-500 italic">
+                Vui lòng quay lại sau khi quá trình đếm ngược kết thúc.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updateTimer() {
+            const now = new Date();
+            
+            // Thiết lập mốc 16h chiều hôm nay
+            const target = new Date();
+            target.setHours(16, 0, 0, 0);
+
+            // Nếu hiện tại đã quá 16h, ta có thể hiển thị thông báo đã xong
+            // Hoặc nếu muốn demo thì coi như 16h ngày mai (tùy mục đích)
+            // Ở đây tôi giả định là 16h chiều nay.
+            let diff = target - now;
+
+            if (diff <= 0) {
+                document.getElementById('hours').innerText = "00";
+                document.getElementById('minutes').innerText = "00";
+                document.getElementById('seconds').innerText = "00";
+                document.getElementById('progress-fill').style.width = "100%";
+                document.getElementById('percent-text').innerText = "100%";
+                document.getElementById('status-msg').innerText = "Hệ thống đã sẵn sàng hoạt động!";
+                document.getElementById('status-msg').classList.add('text-green-400', 'not-italic', 'font-bold');
+                return;
+            }
+
+            const h = Math.floor(diff / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+
+            // Tính toán % tiến độ (giả lập dựa trên thời gian còn lại)
+            // Giả sử tổng thời gian bảo trì là 8 tiếng
+            const totalWorkTime = 8 * 60 * 60 * 1000; 
+            let percentage = Math.max(0, Math.min(99, ((totalWorkTime - diff) / totalWorkTime) * 100));
+            
+            // Nếu diff nhỏ (sắp xong), ép % cao lên
+            if (diff < 3600000) percentage = Math.max(percentage, 90); // Còn dưới 1 tiếng -> >90%
+
+            document.getElementById('progress-fill').style.width = percentage + "%";
+            document.getElementById('percent-text').innerText = Math.floor(percentage) + "%";
+        }
+
+        // Chạy ngay lập tức và sau đó mỗi giây
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    </script>
+</body>
+</html>
+
