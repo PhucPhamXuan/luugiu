@@ -3,138 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bảo trì hệ thống</title>
+    <title>System Check</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            margin: 0;
+            font-family: Inter, system-ui, sans-serif;
             background: #ffffff;
         }
 
-        /* Fade animation */
-        .fade-out {
-            animation: fadeOut 1s ease forwards;
+        /* ===== FULLSCREEN LOADING VIDEO ===== */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.6s ease forwards;
         }
 
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: scale(0.98);
-            }
+        #loading-screen video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none; /* chặn user */
         }
 
-        /* Spinner */
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid #e5e7eb;
-            border-top-color: #6366f1;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        @keyframes fadeIn {
+            from { opacity: 0 }
+            to { opacity: 1 }
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        /* ===== MAINTENANCE PAGE ===== */
+        #maintenance {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .box {
+            max-width: 420px;
         }
     </style>
 </head>
-
-<body class="min-h-screen flex items-center justify-center px-4">
+<body>
 
 <!-- ===============================
-     CÔNG TẮC BẢO TRÌ
-     true  = đang bảo trì
-     false = hoạt động bình thường
+     LOADING VIDEO OVERLAY
 ================================ -->
-<script>
-    const MAINTENANCE_MODE = false;
+<div id="loading-screen">
+    <video
+        autoplay
+        muted
+        playsinline
+        loop
+        preload="auto">
+        <source src="https://cdn.dribbble.com/userupload/18220933/file/original-2f9b699a4f79d031ab97478a41c2056d.mp4" type="video/mp4">
+    </video>
+</div>
 
-    if (!MAINTENANCE_MODE) {
-        window.location.replace("main.html");
-    }
-</script>
-
-<div id="page" class="max-w-md w-full text-center transition-all duration-700">
-
-    <div class="mb-6 flex justify-center">
-        <div class="spinner"></div>
-    </div>
-
-    <h1 class="text-3xl font-extrabold text-gray-900 mb-3">
-        Hệ thống đang bảo trì
-    </h1>
-
-    <p class="text-gray-500 mb-8 text-sm leading-relaxed">
-        Chúng tôi đang nâng cấp để mang lại trải nghiệm tốt hơn.<br>
-        Vui lòng quay lại sau.
-    </p>
-
-    <!-- Countdown -->
-    <div class="grid grid-cols-3 gap-4 mb-8">
-        <div class="border rounded-xl py-4">
-            <div id="hours" class="text-3xl font-bold text-gray-900">00</div>
-            <div class="text-xs text-gray-400 mt-1">GIỜ</div>
-        </div>
-        <div class="border rounded-xl py-4">
-            <div id="minutes" class="text-3xl font-bold text-gray-900">00</div>
-            <div class="text-xs text-gray-400 mt-1">PHÚT</div>
-        </div>
-        <div class="border rounded-xl py-4">
-            <div id="seconds" class="text-3xl font-bold text-gray-900">00</div>
-            <div class="text-xs text-gray-400 mt-1">GIÂY</div>
-        </div>
-    </div>
-
-    <div id="status" class="text-sm text-gray-400">
-        Đang chuẩn bị hệ thống…
+<!-- ===============================
+     MAINTENANCE CONTENT
+================================ -->
+<div id="maintenance">
+    <div class="box">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-4">
+            Hệ thống đang bảo trì
+        </h1>
+        <p class="text-gray-500 text-sm">
+            Chúng tôi đang nâng cấp hệ thống.<br>
+            Vui lòng quay lại sau.
+        </p>
     </div>
 </div>
 
 <script>
-    const page = document.getElementById("page");
+/* ===============================
+   CÔNG TẮC BẢO TRÌ
+   true  = đang bảo trì
+   false = hoạt động bình thường
+================================ */
+const MAINTENANCE_MODE = false;
 
-    function updateTimer() {
-        const now = new Date();
+const loading = document.getElementById("loading-screen");
+const maintenance = document.getElementById("maintenance");
 
-        // Mốc 16:00 hôm nay
-        const target = new Date();
-        target.setHours(16, 0, 0, 0);
+if (!MAINTENANCE_MODE) {
+    // Ẩn maintenance
+    maintenance.style.display = "none";
 
-        let diff = target - now;
+    // Hiện loading video
+    loading.style.display = "flex";
 
-        if (diff <= 0) {
-            document.getElementById("hours").innerText = "00";
-            document.getElementById("minutes").innerText = "00";
-            document.getElementById("seconds").innerText = "00";
-            document.getElementById("status").innerText =
-                "Hệ thống đã sẵn sàng. Đang chuyển hướng…";
-            document.getElementById("status").classList.add("text-indigo-500", "font-semibold");
+    // Khoá scroll
+    document.body.style.overflow = "hidden";
 
-            // Animation + redirect
-            setTimeout(() => {
-                page.classList.add("fade-out");
-            }, 500);
-
-            setTimeout(() => {
-                window.location.replace("main.html");
-            }, 1500);
-
-            return;
-        }
-
-        const h = Math.floor(diff / (1000 * 60 * 60));
-        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const s = Math.floor((diff % (1000 * 60)) / 1000);
-
-        document.getElementById("hours").innerText = String(h).padStart(2, "0");
-        document.getElementById("minutes").innerText = String(m).padStart(2, "0");
-        document.getElementById("seconds").innerText = String(s).padStart(2, "0");
-    }
-
-    updateTimer();
-    setInterval(updateTimer, 1000);
+    // Đợi animation/video chạy rồi redirect
+    setTimeout(() => {
+        window.location.replace("main.html");
+    }, 9000); // chỉnh thời gian theo độ dài animation
+}
 </script>
 
 </body>
